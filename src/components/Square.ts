@@ -14,7 +14,7 @@ export class Square{
         this.squarePosition = squarePosition;
     }
 
-    public getPiece(): Piece{
+    public getPiece(): Piece | null{
         if (this.piece == null) {
             return null;
         } else {
