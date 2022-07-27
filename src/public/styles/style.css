@@ -1,0 +1,42 @@
+body {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+  }
+  
+  .board {
+    display: flex;
+    flex-direction:column;
+    gap: 1px;
+  }
+  
+  .row {
+    display: flex;
+    gap: 1px;
+    width: max-content;
+  }
+  .square {
+    height: 50px;
+    width: 50px;
+    background-color: #eab676;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .square img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .row:nth-child(odd) .square:nth-child(odd), .row:nth-child(even) .square:nth-child(even) {
+    background-color: #873e23;
+  }
+  
+  .square:-moz-drag-over {
+    outline: 1px solid black;
+  }
