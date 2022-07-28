@@ -15,11 +15,7 @@ export class Square{
     }
 
     public getPiece(): Piece | null{
-        if (this.piece == null) {
-            return null;
-        } else {
-            return this.piece;
-        }
+        return this.piece;
     }
 
     public setPiece(piece: Piece) {

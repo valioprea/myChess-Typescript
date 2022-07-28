@@ -19,6 +19,7 @@ body {
     gap: 1px;
     width: max-content;
   }
+
   .square {
     height: 50px;
     width: 50px;
@@ -39,4 +40,9 @@ body {
   
   .square:-moz-drag-over {
     outline: 1px solid black;
+  }
+
+  .attacked {
+    background-color: red;
+    filter: brightness(0.5);
   }

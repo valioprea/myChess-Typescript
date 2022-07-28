@@ -19,47 +19,39 @@ export class SocketIoServer {
     //Also, server responds with info through socket.emit
     private getEvents(){
 
+        //Connected to the play page
         this.socketServer.on("connection", (socket) => {
             
-            //A new connection has been made, a new gameLogic will be born
+            //A new connection has been made, a new gameLogic will be born.
+            //Squares and pieces will be initialized in the game logic class
             let gameLogic: GameLogic = new GameLogic();
             gameLogic.initializeSquares();
             gameLogic.initializePieces();
 
 
-            socket.on("eventStart", (data) => {
-                // console.log(data)
-
-
-                // console.log(g.getAllSquares()[8][1].getPiece());
-
-                // console.log("Pozitia este: ", new Position(3,4))
-
-                // socket.emit("altu", "daniel");
-                // socket.emit("altu", JSON.stringify(g.getAllSquares()[8][1].getPiece()));
-
-                // console.log("********** TEST **********")
-                // console.log( gameLogic.getAllSquares()[8][1].getPiece() )
-                // console.log("**********END TEST **********")
-                // console.log("********** TEST **********")
-                // console.log( gameLogic.getAllSquares()[8][2].getPiece() )
-                // console.log("**********END TEST **********")
+            //The game starts, the front end board will be populated with the pieces
+            socket.on("startGame", () => {
+                console.log("game starts");           
+                let allPieces: Piece[] = gameLogic.getAllPieces( gameLogic.getAllSquares());
+                socket.emit("initializePieces", JSON.stringify(allPieces) );
             })
 
 
-            socket.on("startGame", () => {
-                console.log("game starts");
-            
-                // console.log("********** TEST **********")
-                // console.log( gameLogic.getAllPiecesOfThisColor("white", gameLogic.getAllSquares()) );
-                // console.log("**********END TEST **********")
-                // console.log("********** TEST **********")
-                // console.log( gameLogic.getAllPiecesOfThisColor("black", gameLogic.getAllSquares()) );
-                // console.log("**********END TEST **********")
+            //A piece was selected on the front end
+            socket.on("selectPiece", (frontEndPosition) => {
+                let {rowPosition, colPosition} = JSON.parse(frontEndPosition);
+                gameLogic.grabPiece(new Position(rowPosition,colPosition));
+                // console.log(gameLogic.getRookPositions(gameLogic.getSelectedPiece()!, gameLogic.getAllSquares()));
+                socket.emit("validMoves", JSON.stringify(gameLogic.getRookPositions(gameLogic.getSelectedPiece()!, gameLogic.getAllSquares())));
+            })
 
-           
-                let allPieces: Piece[] = gameLogic.getAllPieces( gameLogic.getAllSquares());
-                socket.emit("initializePieces", JSON.stringify(allPieces) );
+            //A piece was placed on the front end, on a target square
+            socket.on("placedPiece",(targetPosition) => {
+                console.log(targetPosition);
+                
+                let {rowPosition, colPosition} = JSON.parse(targetPosition);
+                gameLogic.placePiece(new Position(rowPosition,colPosition));
+                // console.log()
             })
             
         })

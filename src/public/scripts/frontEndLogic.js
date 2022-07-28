@@ -1,88 +1,88 @@
 const socket = io("ws://localhost:3000");
 
-// ## Use this to allow all square to be moved to
-let items = document.querySelectorAll(".square");
-items.forEach(function (item) {
-	item.addEventListener("dragover", allowDrop);
-	item.addEventListener("drop", drop);
-    item.addEventListener("click", testThingsOut); //TODO: need to find a way to get the clicked square or piece
-});
+//TODO: DELETE THIS
+// // ## Use this to allow all square to be moved to
+// let items = document.querySelectorAll(".square");
+// items.forEach(function (item) {
+// 	item.addEventListener("dragover", allowDrop);
+// 	item.addEventListener("drop", drop);
+// });
 
 
-function testThingsOut(event){
-    console.log("I have been clicked");
-    console.log(event.getData.JSON) //TODO: need to find a way to get the clicked square or piece
-}
+// function testThingsOut(event){
+//     console.log("I have been clicked");
+//     console.log(event.target) //GET CLICKED PIECE
 
-
-//ascult daca serverul zice ceva 
-socket.on("altu", (data) => {
-
-    let object = JSON.parse(data);
-
-    let square = document.getElementsByClassName( object.piecePosition.rowPosition )[0].children[object.piecePosition.colPosition-1]; //TODO: ceva nu e bine aici
-    // square.style = "background-color: red";
     
-    let pic = document.createElement("img");
-    pic.src = "../static/pics/wR.png";
+//     console.log(JSON.stringify(position))
 
-    pic.draggable = true;
-    // pic.ondragstart = drag(event);
-    pic.addEventListener("dragstart", drag);
-    pic.id = 1;
-    square.append(pic);
+//     socket.emit("testClick", JSON.stringify(position))
+    
+// }
 
-    // alert(data);
+socket.on("validMoves", (allValidMovesBackend)=>{
+    JSON.parse(allValidMovesBackend).forEach((position) => {
+        let square = document.getElementsByClassName( position.rowPosition )[0].children[position.colPosition-1];
+        square.addEventListener("dragover", allowDrop);
+        square.addEventListener("drop", drop);
+        square.classList.add("attacked"); //change color
+    })
+    // changeSquareColor(allValidMovesBackend);
 })
 
 
+//Initialize visual pieces
 socket.on("initializePieces", (allBackendPieces) => {
     let allPieces = JSON.parse(allBackendPieces);
-    let index = 1;
-    for(let piece of allPieces){
-        let square = document.getElementsByClassName( piece.piecePosition.rowPosition )[0].children[piece.piecePosition.colPosition-1]; //TODO: ceva nu e bine aici
-        let pic = document.createElement("img");
-
-        // if(piece.)
-        // console.log(piece)
-
-        if(piece.name == "rook"){
-
-            if(piece.color == "white") {
-                pic.src = "../static/pics/wR.png";
-                pic.draggable = true;
-                pic.addEventListener("dragstart", drag);
-                pic.id = index;
-                square.append(pic);
-            } else {
-                pic.src = "../static/pics/bR.png";
-                pic.draggable = true;
-                pic.addEventListener("dragstart", drag);
-                pic.id = index;
-                square.append(pic);
-            }
-
-        } else if(piece.name == "knight") {
-            //logic for knight
-        }
-
-
-
-        index++;
-    }
+    initializePieces(allPieces);
 })
 
 
+//DRAG EVENT
 function drag(event) {
-	event.dataTransfer.setData("text", event.target.id);
+	event.dataTransfer.setData("pieceIdThatIsMoved", event.target.id); //temporary assign pieceIdThatIsMoved property with value of piece id
+    //Send to backend the selected piece
+    document.getElementById(event.target.id);
+    let position = {
+        rowPosition: event.target.dataset.rowPosition,
+        colPosition: event.target.dataset.colPosition
+    };
+    console.log(JSON.stringify(position))
+    socket.emit("selectPiece", JSON.stringify(position));
 }
+
+
+//ALLOW DROP
 function allowDrop(event){
     event.preventDefault(); 
 }
+
+
+
+//DROP EVENT
+//This function applies only to the square on which you drop the piece
 function drop(event) {
-	event.preventDefault();
-	var data = event.dataTransfer.getData("text");
-	event.target.appendChild(document.getElementById(data));
+    //How does a piece looklike ? -> document.getElementById(data)
+    event.preventDefault();
+    let square = event.target;
+	var id = event.dataTransfer.getData("pieceIdThatIsMoved");
+
+    //Place visual piece
+    placePiece(id, square);//id of div & square to place on
+
+
+    //remove event listeners from all squares
+    let items = document.querySelectorAll(".square");
+    items.forEach(function (item) {
+        item.removeEventListener("dragover", allowDrop);
+        item.removeEventListener("drop", drop);
+        item.classList.remove("attacked");
+    });
+
+    //Transmit to server what is the target position on which the piece was dropped
+    // let targetPosition = {rowPosition: square.rowPosition, colPosition: square.colPosition};
+    console.log(event.target.parentElement.className)
+    // socket.emit("placedPiece", JSON.stringify(targetPosition));
 }
 
 
@@ -90,13 +90,6 @@ function drop(event) {
 //Hey server, would you start the game?
 function startGame(){
     socket.emit("startGame");
-}
-
-
-//emitere catre server
-function test(){
-    // alert("salut");
-    socket.emit("eventStart", "vali a emis");
 }
 
 
