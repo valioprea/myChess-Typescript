@@ -443,7 +443,9 @@ export class GameLogic{
 
 
 
-
+    public getMovesForThisPiece(currentPiece: Piece, currentConfiguration: Square[][]){
+        
+    }
 
 
 

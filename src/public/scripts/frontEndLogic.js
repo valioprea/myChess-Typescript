@@ -62,6 +62,7 @@ function allowDrop(event){
 //DROP EVENT
 //This function applies only to the square on which you drop the piece
 function drop(event) {
+    // debugger
     if( event.target.nodeName === "IMG" ) {
         square = event.target.parentNode;
     } else {
