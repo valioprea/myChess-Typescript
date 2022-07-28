@@ -187,9 +187,13 @@ function placePiece(pieceId, targetSquare){
     rowPosition = parseInt(String(targetSquareID)[0]);
     colPosition = parseInt(String(targetSquareID)[1]);
     
+    //eliminate enemy (if any)
     targetSquare.innerHTML = "";
+
+    //place piece on that square
     targetSquare.appendChild(document.getElementById(pieceId));
+
+    //assign piece new coordinates
     document.getElementById(pieceId).dataset.rowPosition = rowPosition;
     document.getElementById(pieceId).dataset.colPosition = colPosition;
-    console.log(document.getElementById(pieceId));
 }
