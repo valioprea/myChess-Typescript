@@ -27,6 +27,7 @@ export class SocketIoServer {
             let gameLogic: GameLogic = new GameLogic();
             gameLogic.initializeSquares();
             gameLogic.initializePieces();
+            gameLogic.initializeGameMechanics();
 
 
             //The game starts, the front end board will be populated with the pieces
@@ -44,7 +45,7 @@ export class SocketIoServer {
                 console.log("INITIAL POSITION, BE: ", initialPosition)
                 gameLogic.grabPiece(initialPosition);
                 // console.log(gameLogic.getRookPositions(gameLogic.getSelectedPiece()!, gameLogic.getAllSquares()));
-                socket.emit("validMoves", JSON.stringify(gameLogic.getRookPositions(gameLogic.getSelectedPiece()!, gameLogic.getAllSquares())));
+                socket.emit("validMoves", JSON.stringify( gameLogic.getMovesForThisPiece(gameLogic.getSelectedPiece()!, gameLogic.getAllSquares())) );
             })
 
             //A piece was placed on the front end, on a target square

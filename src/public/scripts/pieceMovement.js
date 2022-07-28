@@ -16,7 +16,7 @@ What do i need for a piece?
 
 After a piece is initialized, I can add it to the square
 */    
-    let index = 100;
+    let index = 100; //not to have common ids with divs
     for(let piece of allPieces){
         let square = document.getElementsByClassName( piece.piecePosition.rowPosition )[0].children[piece.piecePosition.colPosition-1]; //TODO: ceva nu e bine aici
         let pic = document.createElement("img"); //pic is the actual object of the piece

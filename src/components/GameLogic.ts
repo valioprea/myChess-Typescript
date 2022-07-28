@@ -1,4 +1,5 @@
 import { Bishop } from "./individualPieces/Bishop";
+import { King } from "./individualPieces/King";
 import { Knight } from "./individualPieces/Knight";
 import { Queen } from "./individualPieces/Queen";
 import { Rook } from "./individualPieces/Rook";
@@ -9,10 +10,19 @@ import { Square } from "./Square";
 export class GameLogic{
     
     public allSquares: Square[][] = new Array();
-    public selectedPiece: Piece | null = null; //not sure about the ? thing
+    public selectedPiece: Piece | null = null; //not sure about the ? thing.
+    public gameTurn: String | null = null;
 
     public getSelectedPiece(): Piece | null{
         return this.selectedPiece;
+    }
+
+    public setGameTurn(gameTurn: String){
+        this.gameTurn = gameTurn;
+    }
+
+    public getGameTurn(): String {
+        return this.gameTurn!;
     }
 
     //This function generates the whole board made out of Square objects
@@ -41,6 +51,7 @@ export class GameLogic{
         this.allSquares[8][3].setPiece(new Bishop("bishop", true, "white", new Position(8,3)));
         this.allSquares[8][6].setPiece(new Bishop("bishop", true, "white", new Position(8,6)));
         this.allSquares[8][4].setPiece(new Queen("queen", true, "white", new Position(8,4)));
+        this.allSquares[8][5].setPiece(new King("king", true, "white", new Position(8,5)));
 
         //black pieces
         this.allSquares[1][1].setPiece(new Rook("rook", false, "black", new Position(1,1)));
@@ -50,6 +61,13 @@ export class GameLogic{
         this.allSquares[1][3].setPiece(new Bishop("bishop", false, "black", new Position(1,3)));
         this.allSquares[1][6].setPiece(new Bishop("bishop", false, "black", new Position(1,6)));
         this.allSquares[1][4].setPiece(new Queen("queen", false, "black", new Position(1,4)));
+        this.allSquares[1][5].setPiece(new King("king", false, "black", new Position(1,5)));
+    }
+
+    //This function should deal with game turn
+    //In the future: FEN / notations / timer / score ?
+    public initializeGameMechanics() {
+        this.setGameTurn("white");
     }
 
     //Function that will return either all white / black pieces.
@@ -97,13 +115,40 @@ export class GameLogic{
 
 
     public grabPiece(position: Position){
-        console.log("GAMELOGIC: this is the position at which I select the piece: ",this.selectedPiece);
         this.selectedPiece = this.allSquares[position.getRowPosition()][position.getColPosition()].getPiece();
+        console.log("GAMELOGIC: this is the position at which I select the piece: ",this.selectedPiece?.getPiecePosition());
         console.log("GAMELOGIC: this is the selected piece: ",this.selectedPiece);
     }
 
     public ungrabPiece() {
         this.selectedPiece = null;
+    }
+
+    public finishTurn() {
+        //Who did finish the turn ?
+        if( this.selectedPiece!.getColor() == "white" ){
+            //white finished the turn
+            //deactivate white pieces + activate black pieces
+            for(let piece of this.getAllPiecesOfThisColor("white", this.getAllSquares()) ){
+                piece.setCanBeMoved(false);
+            }
+            for(let piece of this.getAllPiecesOfThisColor("black", this.getAllSquares()) ){
+                piece.setCanBeMoved(true);
+            }
+            this.setGameTurn("black"); //-> black is next
+            console.log("Black moves now ->");
+        } else {
+            //black finished the turn
+            //deactivate black pieces + activate white pieces
+            for(let piece of this.getAllPiecesOfThisColor("black", this.getAllSquares()) ){
+                piece.setCanBeMoved(false);
+            }
+            for(let piece of this.getAllPiecesOfThisColor("white", this.getAllSquares()) ){
+                piece.setCanBeMoved(true);
+            }
+            this.setGameTurn("white"); //-> white is next
+            console.log("White moves now ->");
+        }
     }
 
     // Function that places piece x on position y
@@ -126,6 +171,7 @@ export class GameLogic{
         //Assign new coordinates for the recently placed piece
         this.selectedPiece!.setPiecePosition(new Position(targetPosition.getRowPosition(), targetPosition.getColPosition()));
         
+        this.finishTurn();
         this.ungrabPiece();
         
 
@@ -441,10 +487,257 @@ export class GameLogic{
         return queenTargets;
     }
 
+    public getKingPositionsRelativeToPieces(currentKing: Piece, currentConfiguration: Square[][]) {
+        let targets: Position[] = new Array();
+        let currentRowPosition = currentKing.getPiecePosition().getRowPosition();
+        let currentColumnPosition = currentKing.getPiecePosition().getColPosition();
 
+        //IS THE TARGET SQUARE REACHABLE FOR THE King ?
+        if( 8 >= currentRowPosition -1 && currentRowPosition -1 >= 1 && currentColumnPosition-1 >=1 && currentColumnPosition-1<=8){
+            //Is there a piece ?
+            if (currentConfiguration[currentRowPosition - 1][currentColumnPosition - 1].getPiece() !== null ) {
+                //Is that piece a different color compared to the one in my hand ?
+                if (  currentConfiguration[currentRowPosition-1][currentColumnPosition-1].getPiece()!.getColor() != currentKing.getColor() ){
+                    targets.push(new Position(currentRowPosition-1,currentColumnPosition-1));
+                }
+            } else {
+                //the square was empty
+                targets.push(new Position(currentRowPosition-1,currentColumnPosition-1));
+            }
+        }
 
-    public getMovesForThisPiece(currentPiece: Piece, currentConfiguration: Square[][]){
+        if( 8>= currentRowPosition-1 && currentRowPosition-1 >= 1 && currentColumnPosition <=8 && currentColumnPosition>=1 ){
+            //Is there a piece ?
+            if (currentConfiguration[currentRowPosition-1 ][currentColumnPosition ].getPiece() !== null ) {
+                //Is that piece a different color compared to the one in my hand ?
+                if (  currentConfiguration[currentRowPosition-1][currentColumnPosition].getPiece()!.getColor() != currentKing.getColor() ){
+                    targets.push(new Position(currentRowPosition-1,currentColumnPosition));
+                }
+            } else {
+                //the square was empty
+                targets.push(new Position(currentRowPosition-1,currentColumnPosition));
+            }
+        }
+
+        if( 8>= currentRowPosition-1 && currentRowPosition-1 >= 1 && currentColumnPosition+1 <=8 && currentColumnPosition+1>=1 ){
+            //Is there a piece ?
+            if (currentConfiguration[currentRowPosition - 1][currentColumnPosition + 1].getPiece() !== null ) {
+                //Is that piece a different color compared to the one in my hand ?
+                if ( currentConfiguration[currentRowPosition-1][currentColumnPosition+1].getPiece()!.getColor() != currentKing.getColor() ){
+                    targets.push(new Position(currentRowPosition-1,currentColumnPosition+1));
+                }
+            } else {
+                //the square was empty
+                targets.push(new Position(currentRowPosition-1,currentColumnPosition+1));
+            }
+        }
+
+        if( currentRowPosition <= 8 && currentColumnPosition-1 <=8 && currentColumnPosition-1>=1){
+            //Is there a piece ?
+            if (currentConfiguration[currentRowPosition][currentColumnPosition -1].getPiece() !== null ) {
+                //Is that piece a different color compared to the one in my hand ?
+                if ( currentConfiguration[currentRowPosition][currentColumnPosition-1].getPiece()!.getColor() != currentKing.getColor() ){
+                    targets.push(new Position(currentRowPosition,currentColumnPosition-1));
+                }
+            } else {
+                //the square was empty
+                targets.push(new Position(currentRowPosition,currentColumnPosition-1));
+            }
+        }
+
+        if( currentRowPosition <= 8 && currentColumnPosition+1 <=8 ){
+            //Is there a piece ?
+            if (currentConfiguration[currentRowPosition][currentColumnPosition + 1].getPiece() !== null ) {
+                //Is that piece a different color compared to the one in my hand ?
+                if ( currentConfiguration[currentRowPosition][currentColumnPosition+1].getPiece()!.getColor() != currentKing.getColor() ){
+                    targets.push(new Position(currentRowPosition,currentColumnPosition+1));
+                }
+            } else {
+                //the square was empty
+                targets.push(new Position(currentRowPosition,currentColumnPosition+1));
+            }
+        }
+
+        if(currentRowPosition+1 <= 8 && currentColumnPosition-1 >=1 ){
+            //Is there a piece ?
+            if (currentConfiguration[currentRowPosition+1][currentColumnPosition - 1].getPiece() !== null ) {
+                //Is that piece a different color compared to the one in my hand ?
+                if ( currentConfiguration[currentRowPosition+1][currentColumnPosition-1].getPiece()!.getColor() != currentKing.getColor() ){
+                    targets.push(new Position(currentRowPosition+1,currentColumnPosition-1));
+                }
+            } else {
+                //the square was empty
+                targets.push(new Position(currentRowPosition+1,currentColumnPosition-1));
+            }
+        }
+
+        if(  currentRowPosition+1 <= 8 ){
+            //Is there a piece ?
+            if (currentConfiguration[currentRowPosition + 1][currentColumnPosition ].getPiece() !== null ) {
+                //Is that piece a different color compared to the one in my hand ?
+                if ( currentConfiguration[currentRowPosition+1][currentColumnPosition].getPiece()!.getColor() != currentKing.getColor() ){
+                    targets.push(new Position(currentRowPosition+1,currentColumnPosition));
+                }
+            } else {
+                //the square was empty
+                targets.push(new Position(currentRowPosition+1,currentColumnPosition));
+            }
+        }
+
+        if( currentRowPosition+1 <=8 && currentColumnPosition+1 <=8 ){
+            //Is there a piece ?
+            if (currentConfiguration[currentRowPosition + 1][currentColumnPosition +1].getPiece() !== null ) {
+                //Is that piece a different color compared to the one in my hand ?
+                if ( currentConfiguration[currentRowPosition+1][currentColumnPosition+1].getPiece()!.getColor() != currentKing.getColor() ){
+                    targets.push(new Position(currentRowPosition+1,currentColumnPosition+1));
+                }
+            } else {
+                //the square was empty
+                targets.push(new Position(currentRowPosition+1,currentColumnPosition+1));
+            }
+        }
+        return targets;
+    }
+
+    public getKingPositions(currentKing: Piece, currentConfiguration: Square[][]){
         
+        //Get possible positions for my king relative to all pieces
+        let myKingPositionsRelativeToPieces: Position[] = this.getKingPositionsRelativeToPieces(currentKing, currentConfiguration);
+        
+        //Find opponent's king
+        let opponentKing: Piece | null = null;
+        for(let i=1;i<=8;i++){
+            for(let j=1;j<8;j++){
+                //Does this square contain a piece?
+                if( this.allSquares[i][j].getPiece() !== null ) {
+                    //Is this piece the opponent king?
+                    if( this.allSquares[i][j].getPiece()!.getColor() !== currentKing.getColor() 
+                    && this.allSquares[i][j].getPiece()!.getName() === "king" ){
+                        opponentKing = this.allSquares[i][j].getPiece();
+                    }
+                }
+            }
+        }
+        
+        //Get possible positions for the opponent's king
+        let opponentKingPositionsRelativeToPieces: Position[] = this.getKingPositionsRelativeToPieces(opponentKing!, currentConfiguration);
+        
+        //Get squares attacked by both kings
+        let commonAttackedPositions: Position[] = new Array();
+        for(let myPosition of myKingPositionsRelativeToPieces){
+            for(let opponentPosition of opponentKingPositionsRelativeToPieces){
+                if ( myPosition.equals(opponentPosition)){
+                    commonAttackedPositions.push(myPosition);
+                }
+            }
+        }
+        
+        // //Remove common attacked squares by both king from my possibilities of positions
+        let targets: Position[] = new Array();
+        
+        let diff = this.getDifference(myKingPositionsRelativeToPieces,commonAttackedPositions);
+
+
+        for(let target of diff){
+            targets.push(target);
+        }
+
+        return targets;
+    }
+
+    //Get a difference between two groups / arrays
+    //CAREFUL! only one way approach
+    //Source: https://bobbyhadz.com/blog/typescript-difference-between-two-arrays
+    public getDifference<T>(a: T[], b: T[]): T[] {
+        return a.filter((element) => {
+          return !b.includes(element);
+        });
+    }
+
+    public getAllAttackedSquaresByOpponent(currentConfiguration: Square[][]) : Position[] {
+        //Aux transformation
+        let opponentColor: string | null = null;
+        if( this.getGameTurn() == "white"){
+            opponentColor = "black";
+        } else {
+            opponentColor = "white";
+        }
+
+        let allOpponentPieces: Piece[] = this.getAllPiecesOfThisColor(opponentColor, currentConfiguration);
+        let allOpponentPossibleAttacks: Position[] = new Array();
+
+        for (let piece of allOpponentPieces){
+
+            if( piece.getName() == "rook" ){
+
+                //I am grabbing the attacked positions of this piece, at its own position!
+                for(let position of this.getRookPositions(piece,currentConfiguration)){
+                    allOpponentPossibleAttacks.push(position);
+                }
+
+            } else if (piece.getName() == "knight") {
+
+                //I am grabbing the attacked positions of this piece, at its own position!
+                for(let position of this.getKnightPositions(piece,currentConfiguration)){
+                    allOpponentPossibleAttacks.push(position);
+                }
+
+            } else if (piece.getName() == "bishop") {
+
+                //I am grabbing the attacked positions of this piece, at its own position!
+                for(let position of this.getBishopPositions(piece,currentConfiguration)){
+                    allOpponentPossibleAttacks.push(position);
+                }
+
+            } else if (piece.getName() == "queen") {
+
+                //I am grabbing the attacked positions of this piece, at its own position!
+                for(let position of this.getQueenPositions(piece,currentConfiguration)){
+                    allOpponentPossibleAttacks.push(position);
+                }
+            } else if (piece.getName() == "king") {
+
+                //I am grabbing the attacked positions of this piece, at its own position!
+                for(let position of this.getKingPositions(piece,currentConfiguration)){
+                    allOpponentPossibleAttacks.push(position);
+                }
+            }
+        }
+
+        //This list could contain duplicates
+        return allOpponentPossibleAttacks;
+    }
+    // *******END  COMPUTATIONAL FUNCTIONS - KINEMATIC PURPOSES **************************
+
+
+
+
+
+
+
+
+
+
+
+    
+    public getMovesForThisPiece(currentPiece: Piece, currentConfiguration: Square[][]){
+
+        let kinematicMoves: Position[] = new Array();
+
+        if (currentPiece.getName() === "rook"){
+            kinematicMoves = this.getRookPositions(currentPiece,currentConfiguration);
+        } else if (currentPiece.getName() === "knight") {
+            kinematicMoves = this.getKnightPositions(currentPiece,currentConfiguration);
+        } else if (currentPiece.getName() === "bishop") {
+            kinematicMoves = this.getBishopPositions(currentPiece,currentConfiguration);
+        } else if (currentPiece.getName() === "queen") {
+            kinematicMoves = this.getQueenPositions(currentPiece,currentConfiguration);
+        } else if (currentPiece.getName() === "king") {
+            kinematicMoves = this.getKingPositions(currentPiece,currentConfiguration);
+        } else if (currentPiece.getName() === "pawn") {
+            
+        }
+        return kinematicMoves;
     }
 
 
@@ -452,7 +745,7 @@ export class GameLogic{
 
     //DEVELOPMENT FUNCTIONS
     public sanityCheck(){
-
+        //Will print on the console all info that the server board contains.
         console.log("******************** SANITY CHECK BOARD SQUARES AND PIECES ********************************")
         for( let i=1; i<=8; i++){
             for( let j=1; j<=8; j++){
