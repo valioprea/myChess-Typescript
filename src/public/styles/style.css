@@ -43,6 +43,6 @@ body {
   }
 
   .attacked {
-    background-color: red;
+    background-color: rgb(34, 137, 160);
     filter: brightness(0.5);
   }

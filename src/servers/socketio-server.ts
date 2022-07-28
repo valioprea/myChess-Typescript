@@ -40,18 +40,23 @@ export class SocketIoServer {
             //A piece was selected on the front end
             socket.on("selectPiece", (frontEndPosition) => {
                 let {rowPosition, colPosition} = JSON.parse(frontEndPosition);
-                gameLogic.grabPiece(new Position(rowPosition,colPosition));
+                let initialPosition: Position = new Position(rowPosition,colPosition);
+                console.log("INITIAL POSITION, BE: ", initialPosition)
+                gameLogic.grabPiece(initialPosition);
                 // console.log(gameLogic.getRookPositions(gameLogic.getSelectedPiece()!, gameLogic.getAllSquares()));
                 socket.emit("validMoves", JSON.stringify(gameLogic.getRookPositions(gameLogic.getSelectedPiece()!, gameLogic.getAllSquares())));
             })
 
             //A piece was placed on the front end, on a target square
             socket.on("placedPiece",(targetPosition) => {
-                console.log(targetPosition);
-                
                 let {rowPosition, colPosition} = JSON.parse(targetPosition);
                 gameLogic.placePiece(new Position(rowPosition,colPosition));
-                // console.log()
+            })
+
+
+            //FOR DEVELOPMENT PURPOSES SANITY CHECK
+            socket.on("sanityCheck", () => {
+                gameLogic.sanityCheck();
             })
             
         })

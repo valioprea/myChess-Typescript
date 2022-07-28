@@ -84,30 +84,36 @@ export class GameLogic{
 
 
     public grabPiece(position: Position){
+        console.log("GAMELOGIC: this is the position at which I select the piece: ",this.selectedPiece);
         this.selectedPiece = this.allSquares[position.getRowPosition()][position.getColPosition()].getPiece();
-        console.log(this.selectedPiece);
+        console.log("GAMELOGIC: this is the selected piece: ",this.selectedPiece);
+    }
+
+    public ungrabPiece() {
+        this.selectedPiece = null;
     }
 
     // Function that places piece x on position y
     public placePiece(targetPosition: Position) {
-        
+        console.log("GAMELOGIC: place piece here: ", targetPosition)        
         //Here i don't need to ask myself if I am hovering over a friendly piece since I am setting event triggers on valid squares only.
 
         //Eliminate selected piece from previous square
         this.allSquares[this.selectedPiece!.getPiecePosition().getRowPosition()][this.selectedPiece!.getPiecePosition().getColPosition()].eliminatePiece(this.selectedPiece!);
 
-        //Is the target square empty?
-        if(this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].getPiece() !== null ) {
-
-            //Is that piece a foe ?
-            if(this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].getPiece()!.getColor() !== this.selectedPiece!.getColor()){
-                this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].eliminatePiece(this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].getPiece()!);
-            }
-
-            //Assign selected piece to new square
-            this.selectedPiece!.setPiecePosition(new Position(targetPosition.getRowPosition(), targetPosition.getColPosition()));
+        //If there is a foe on target square, eliminate the foe!
+        if(this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].getPiece() !== null ){
+            this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()]
+            .eliminatePiece(this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].getPiece()!);
         }
+
+        //Assign selected piece to new square
+        this.getAllSquares()[targetPosition.getRowPosition()][targetPosition.getColPosition()].setPiece(this.selectedPiece!);
+
+        //Assign new coordinates for the recently placed piece
+        this.selectedPiece!.setPiecePosition(new Position(targetPosition.getRowPosition(), targetPosition.getColPosition()));
         
+        this.ungrabPiece();
         
 
     }
@@ -204,5 +210,27 @@ export class GameLogic{
         // let targets: Position
     }
 
+
+
+
+
+
+
+
+
+
+    //DEVELOPMENT FUNCTIONS
+    public sanityCheck(){
+
+        console.log("******************** SANITY CHECK BOARD SQUARES AND PIECES ********************************")
+        for( let i=1; i<=8; i++){
+            for( let j=1; j<=8; j++){
+                console.log(this.allSquares[i][j]);
+            }
+        }
+        console.log("*****************END SANITY CHECK BOARD SQUARES AND PIECES ********************************")
+        console.log("*******************************************************************************************")
+    }
+    
 
 }

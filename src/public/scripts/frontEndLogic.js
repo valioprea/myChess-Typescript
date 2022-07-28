@@ -47,7 +47,7 @@ function drag(event) {
         rowPosition: event.target.dataset.rowPosition,
         colPosition: event.target.dataset.colPosition
     };
-    console.log(JSON.stringify(position))
+    // console.log("Dragging from position: ",JSON.stringify(position))
     socket.emit("selectPiece", JSON.stringify(position));
 }
 
@@ -62,14 +62,16 @@ function allowDrop(event){
 //DROP EVENT
 //This function applies only to the square on which you drop the piece
 function drop(event) {
-    //How does a piece looklike ? -> document.getElementById(data)
+    if( event.target.nodeName === "IMG" ) {
+        square = event.target.parentNode;
+    } else {
+        square = event.target;
+    }
     event.preventDefault();
-    let square = event.target;
-	var id = event.dataTransfer.getData("pieceIdThatIsMoved");
+	let id = event.dataTransfer.getData("pieceIdThatIsMoved"); //get transferred piece ID
 
     //Place visual piece
-    placePiece(id, square);//id of div & square to place on
-
+    placePiece(id, square); //id of piece & square to place on
 
     //remove event listeners from all squares
     let items = document.querySelectorAll(".square");
@@ -80,9 +82,14 @@ function drop(event) {
     });
 
     //Transmit to server what is the target position on which the piece was dropped
-    // let targetPosition = {rowPosition: square.rowPosition, colPosition: square.colPosition};
-    console.log(event.target.parentElement.className)
-    // socket.emit("placedPiece", JSON.stringify(targetPosition));
+    //get square id
+    targetSquareID = square.id;
+    //get square position (from div)
+    rowPosition = parseInt(String(targetSquareID)[0]);
+    colPosition = parseInt(String(targetSquareID)[1]);
+    let targetPosition = {rowPosition, colPosition};
+    
+    socket.emit("placedPiece", JSON.stringify(targetPosition));
 }
 
 
@@ -92,6 +99,11 @@ function startGame(){
     socket.emit("startGame");
 }
 
+
+//Sanity checks - development purposes
+function checkSanity(){
+    socket.emit("sanityCheck");
+}
 
 
 

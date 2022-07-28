@@ -178,26 +178,18 @@ After a piece is initialized, I can add it to the square
 }
 
 //a square: document.getElementsByClassName( i )[0].children[ j ] where i=row from 1 to 8 and j=column from 0 to 7
-
-
 //PLACE A PIECE
-function placePiece(id, square){
+function placePiece(pieceId, targetSquare){
 
-    console.log(square)
-    console.log(document.getElementsByClassName( 8 )[0].children[ 0 ].childNodes.length);
+    //get square id
+    targetSquareID = targetSquare.id;
+    //get square position (from div)
+    rowPosition = parseInt(String(targetSquareID)[0]);
+    colPosition = parseInt(String(targetSquareID)[1]);
     
-    
-    //Is there an enemy piece?
-    if(square.childNodes.length !== 0) {
-        //eliminate that piece and place mine there
-        // square.empty();
-        square.appendChild(document.getElementById(id));
-        document.getElementById(id).rowPosition = square.rowPosition;
-        document.getElementById(id).colPosition = square.colPosition;
-    } else {
-        square.appendChild(document.getElementById(id));
-        document.getElementById(id).rowPosition = square.rowPosition;
-        document.getElementById(id).colPosition = square.colPosition;
-    }
-
+    targetSquare.innerHTML = "";
+    targetSquare.appendChild(document.getElementById(pieceId));
+    document.getElementById(pieceId).dataset.rowPosition = rowPosition;
+    document.getElementById(pieceId).dataset.colPosition = colPosition;
+    console.log(document.getElementById(pieceId));
 }
