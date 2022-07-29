@@ -721,29 +721,27 @@ export class GameLogic{
         if (currentPiece.getName() === "rook"){
             
             kinematicMoves = this.getRookPositions(currentPiece,currentConfiguration);
-            results = this.algorithm_legalMovesOfThisPiece(currentPiece, kinematicMoves);
-            // console.log("GAME LOGIC: getMovesForThisPiece (rook): ",kinematicMoves)
-            // return this.algorithm_legalMovesOfThisPiece(currentPiece, kinematicMoves);
-
+            
         } else if (currentPiece.getName() === "knight") {
-
+            
             kinematicMoves = this.getKnightPositions(currentPiece,currentConfiguration);
-
+            
         } else if (currentPiece.getName() === "bishop") {
-
+            
             kinematicMoves = this.getBishopPositions(currentPiece,currentConfiguration);
-
+            
         } else if (currentPiece.getName() === "queen") {
-
+            
             kinematicMoves = this.getQueenPositions(currentPiece,currentConfiguration);
-
+            
         } else if (currentPiece.getName() === "king") {
-
+            
             kinematicMoves = this.getKingPositions(currentPiece,currentConfiguration);
-
+            
         } else if (currentPiece.getName() === "pawn") {
-
+            
         }
+        results = this.algorithm_legalMovesOfThisPiece(currentPiece, kinematicMoves);
         return results;
     }
 
@@ -818,15 +816,15 @@ export class GameLogic{
             }
         }
         
-            console.log("***TEST***")
-            console.log(legalMovesOfThisPiece)
-            console.log("***END TEST***")
+            // console.log("***TEST***")
+            // console.log(legalMovesOfThisPiece)
+            // console.log("***END TEST***")
 
         return legalMovesOfThisPiece;
     }
 
 
-    //Function that place the imaginary piece on the imaginary board. Imaginary = copy of real for each kinematic possible position
+    //Function that places the imaginary piece on the imaginary board. Imaginary = copy of real for each kinematic possible position
     public placeImaginaryPieceOnImaginaryBoard(currentImaginaryPiece: Piece, targetImaginaryPosition: Position, imaginaryBoard: Square[][]) {
               
         //Eliminate selected piece from previous square
