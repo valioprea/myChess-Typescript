@@ -6,6 +6,7 @@ import { Rook } from "./individualPieces/Rook";
 import { Piece } from "./Piece";
 import { Position } from "./Position";
 import { Square } from "./Square";
+const _ = require('lodash');
 
 export class GameLogic{
     
@@ -115,11 +116,11 @@ export class GameLogic{
 
 
     public grabPiece(position: Position){
-        console.log("GAMELOGIC -> grabPiece -> position from FE: ", position)
-        console.log("GAMELOGIC -> grabPiece -> square at position from FE: ",this.allSquares[position.getRowPosition()][position.getColPosition()])
+        // console.log("GAMELOGIC -> grabPiece -> position from FE: ", position)
+        // console.log("GAMELOGIC -> grabPiece -> square at position from FE: ",this.allSquares[position.getRowPosition()][position.getColPosition()])
         this.selectedPiece = this.allSquares[position.getRowPosition()][position.getColPosition()].getPiece()!;
-        console.log("GAMELOGIC: this is the position at which I select the piece: ",this.selectedPiece?.getPiecePosition());
-        console.log("GAMELOGIC: this is the selected piece: ",this.selectedPiece);
+        // console.log("GAMELOGIC: this is the position at which I select the piece: ",this.selectedPiece?.getPiecePosition());
+        // console.log("GAMELOGIC: this is the selected piece: ",this.selectedPiece);
     }
 
     public ungrabPiece() {
@@ -156,7 +157,7 @@ export class GameLogic{
 
     // Function that places piece x on position y
     public placePiece(targetPosition: Position) {
-        console.log("GAMELOGIC: place piece here: ", targetPosition)        
+        
         //Here i don't need to ask myself if I am hovering over a friendly piece since I am setting event triggers on valid squares only.
 
         //Eliminate selected piece from previous square
@@ -747,7 +748,7 @@ export class GameLogic{
     }
 
     public algorithm_legalMovesOfThisPiece(currentPiece: Piece, currentKinematicMoves: Position[]): Position[] {
-        console.log("GAMELOGIC, algorithm_legalMovesOfThisPiece: currentKinematicMoves: ",currentKinematicMoves)
+        
         let color: string;
         let oppositeColor: string;
         if( this.getGameTurn() == "white"){
@@ -764,22 +765,31 @@ export class GameLogic{
         for ( let position of currentKinematicMoves ) {
 
             //Create imaginary board - copy the current physical board with all the pieces
-            // let imaginaryBoard = this.getAllSquares();
-            let imaginaryBoard = Object.create(this.getAllSquares());
-            
-            // console.log("DE AICI INCEPE IMAGINARY BOARD",imaginaryBoard[1][1]);
+            let imaginaryBoard = _.cloneDeep(this.getAllSquares());
 
             //GET imaginary piece (the copy of the current piece)
             let imaginaryPiece: Piece = imaginaryBoard[currentPiece.getPiecePosition().getRowPosition()][currentPiece.getPiecePosition().getColPosition()]!.getPiece()!;
-            // console.log("IMAGINARY PIECE: ",imaginaryPiece)
+            
             //Place imaginary piece on position j on the imaginary board
             this.placeImaginaryPieceOnImaginaryBoard(imaginaryPiece, position, imaginaryBoard);
+
+            // console.log("***TEST***")
+            // console.log(imaginaryBoard[imaginaryPiece.getPiecePosition().getRowPosition()][imaginaryPiece.getPiecePosition().getColPosition()])
+            // console.log("***END TEST***")
 
             //GET all attacked positions by opponent - IMAGINARY CONTEXT
             let dangerZone: Position[] = this.getAllAttackedSquaresByOpponent(imaginaryBoard, oppositeColor);
 
+            // console.log("***TEST***")
+            // console.log(dangerZone)
+            // console.log("***END TEST***")
+
             //GET all my pieces from the imaginary board
             let myImaginaryArrangement: Piece[] = this.getAllPiecesOfThisColor(color, imaginaryBoard);
+
+            // console.log("***TEST***")
+            // console.log(myImaginaryArrangement)
+            // console.log("***END TEST***")
 
             //Find position of my king in the imaginary board
             let kingImaginaryPosition: Position;
@@ -789,13 +799,29 @@ export class GameLogic{
                 }
             }
 
+            // console.log("***TEST***")
+            // console.log(kingImaginaryPosition!)
+            // console.log("***END TEST***")
+            
+
             //Search algorithm. Is my king in the dangerZone still? aka Is my king in check?
+            let index = 0;
             for ( let dangerPosition of dangerZone ) {
-                if ( !kingImaginaryPosition!.equals(dangerPosition) ) {
-                    legalMovesOfThisPiece.push(position);
+                if ( kingImaginaryPosition!.equals(dangerPosition) ) {
+                    // legalMovesOfThisPiece.push(position);
+                    index ++;
                 }
             }
+            //If the index is greater than 0 that means the king is in check
+            if (index === 0){
+                legalMovesOfThisPiece.push(position);
+            }
         }
+        
+            console.log("***TEST***")
+            console.log(legalMovesOfThisPiece)
+            console.log("***END TEST***")
+
         return legalMovesOfThisPiece;
     }
 
