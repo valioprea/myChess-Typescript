@@ -30,8 +30,9 @@ After a piece is initialized, I can add it to the square
                 pic.src = "../static/pics/wR.png";
                 pic.dataset.rowPosition = piece.piecePosition.rowPosition;
                 pic.dataset.colPosition = piece.piecePosition.colPosition;
-                pic.draggable = true;
+                pic.draggable = true; //TODO: de scos de peste tot
                 pic.addEventListener("dragstart", drag);
+                // pic.addEventListener("dragend", dragend)
                 // pic.addEventListener("click", testThingsOut);
                 square.append(pic);
             } else {

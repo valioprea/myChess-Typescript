@@ -1,6 +1,7 @@
 import { Bishop } from "./individualPieces/Bishop";
 import { King } from "./individualPieces/King";
 import { Knight } from "./individualPieces/Knight";
+import { Pawn } from "./individualPieces/Pawn";
 import { Queen } from "./individualPieces/Queen";
 import { Rook } from "./individualPieces/Rook";
 import { Piece } from "./Piece";
@@ -53,6 +54,11 @@ export class GameLogic{
         this.allSquares[8][6].setPiece(new Bishop("bishop", true, "white", new Position(8,6)));
         this.allSquares[8][4].setPiece(new Queen("queen", true, "white", new Position(8,4)));
         this.allSquares[8][5].setPiece(new King("king", true, "white", new Position(8,5)));
+        for(let i=1; i<=8; i++){
+            this.allSquares[7][i].setPiece(new Pawn("pawn", true, "white", new Position(7,i)));
+        }
+
+        
 
         //black pieces
         this.allSquares[1][1].setPiece(new Rook("rook", false, "black", new Position(1,1)));
@@ -63,6 +69,9 @@ export class GameLogic{
         this.allSquares[1][6].setPiece(new Bishop("bishop", false, "black", new Position(1,6)));
         this.allSquares[1][4].setPiece(new Queen("queen", false, "black", new Position(1,4)));
         this.allSquares[1][5].setPiece(new King("king", false, "black", new Position(1,5)));
+        for(let i=1; i<=8; i++){
+            this.allSquares[2][i].setPiece(new Pawn("pawn", false, "black", new Position(2,i)));
+        }
     }
 
     //This function should deal with game turn
@@ -174,6 +183,14 @@ export class GameLogic{
 
         //Assign new coordinates for the recently placed piece
         this.selectedPiece!.setPiecePosition(new Position(targetPosition.getRowPosition(), targetPosition.getColPosition()));
+
+        //Was that piece a pawn?
+        if (this.selectedPiece!.getName() === "pawn"){
+            let currentPawn: Pawn | null = this.selectedPiece as Pawn;
+            currentPawn.hasMoved(); //->that pawn has moved.
+            currentPawn = null;
+        }
+
         this.finishTurn();
     }
 
@@ -645,6 +662,71 @@ export class GameLogic{
         return targets;
     }
 
+    //TODO: enpassant
+    public getPawnPositions(currentPawn: Pawn, currentConfiguration: Square[][]){
+        let targets: Position[] = new Array();
+
+        let aboveRow = -1;
+        let aboveAboveRow = -1;
+        let aboveWestCol = currentPawn.getPiecePosition().getColPosition()-1;
+        let aboveEastCol = currentPawn.getPiecePosition().getColPosition()+1;
+
+        //THE GENERAL MOVEMENT LOGIC
+        // "above" is a relative term. Refers to the pawn direction
+        if (currentPawn.getColor() == "white") {
+            aboveRow = currentPawn.getPiecePosition().getRowPosition()-1;
+            aboveAboveRow = currentPawn.getPiecePosition().getRowPosition()-2;
+        } else {
+            aboveRow = currentPawn.getPiecePosition().getRowPosition()+1;
+            aboveAboveRow = currentPawn.getPiecePosition().getRowPosition()+2;
+        }
+
+        //Is the above row available?
+        if ( aboveRow >= 1 || aboveRow <=8 ) {
+            
+            //Is the next square empty? Straight ahead, first square.
+            if ( currentConfiguration[aboveRow][currentPawn.getPiecePosition().getColPosition()].getPiece() === null ) {
+                //That square is empty, that is a valid move
+                targets.push( new Position(aboveRow, currentPawn.getPiecePosition().getColPosition()) );
+            }
+
+            //Is there a piece on aboveWest ?
+            if(aboveWestCol>=1){
+                if ( currentConfiguration[aboveRow][aboveWestCol].getPiece() !== null ){
+                    //Is that piece an enemy?
+                    if ( currentConfiguration[aboveRow][aboveWestCol].getPiece()!.getColor() !== currentPawn.getColor()){
+                        targets.push( new Position(aboveRow, aboveWestCol) );
+                    }
+                }
+            }
+            
+
+            //Is there a piece on aboveEast ?
+            if (aboveEastCol <= 8){
+                if ( currentConfiguration[aboveRow][aboveEastCol].getPiece() !== null ){
+                    //Is that piece an enemy?
+                    if ( currentConfiguration[aboveRow][aboveEastCol].getPiece()!.getColor() !== currentPawn.getColor()){
+                        targets.push( new Position(aboveRow, aboveEastCol) );
+                    }
+                }
+            }
+            
+            
+            //Can I move the pawn two squares?
+            //Was the pawn moved?
+            if ( currentPawn.getWasMoved() === false ) {
+                //Are both squares in front of the pawn empty?
+                if ( 
+                    currentConfiguration[aboveRow][currentPawn.getPiecePosition().getColPosition()].getPiece() === null &&
+                    currentConfiguration[aboveAboveRow][currentPawn.getPiecePosition().getColPosition()].getPiece() === null
+                 ) {
+                    targets.push( new Position(aboveAboveRow, currentPawn.getPiecePosition().getColPosition()) );
+                 }
+            }            
+        }
+        return targets;
+    }
+
     //Get a difference between two groups / arrays
     //CAREFUL! only one way approach
     //Source: https://bobbyhadz.com/blog/typescript-difference-between-two-arrays
@@ -694,6 +776,12 @@ export class GameLogic{
                 for(let position of this.getKingPositions(piece,currentConfiguration)){
                     allOpponentPossibleAttacks.push(position);
                 }
+            } else if (piece.getName() == "pawn") {
+                
+                //I am grabbing the attacked positions of this piece, at its own position!
+                for(let position of this.getPawnPositions(piece as Pawn,currentConfiguration)){
+                    allOpponentPossibleAttacks.push(position);
+                }
             }
         }
 
@@ -740,6 +828,8 @@ export class GameLogic{
             
         } else if (currentPiece.getName() === "pawn") {
             
+            kinematicMoves = this.getPawnPositions(currentPiece as Pawn,currentConfiguration);
+
         }
         results = this.algorithm_legalMovesOfThisPiece(currentPiece, kinematicMoves);
         return results;
@@ -841,6 +931,13 @@ export class GameLogic{
 
         //Assign new coordinates for the recently placed piece
         currentImaginaryPiece.setPiecePosition(new Position(targetImaginaryPosition.getRowPosition(), targetImaginaryPosition.getColPosition()));
+
+        //Was that piece a pawn?
+        if (currentImaginaryPiece.getName() === "pawn"){
+            let currentPawn: Pawn | null = currentImaginaryPiece as Pawn;
+            currentPawn.hasMoved(); //->that pawn has moved.
+            currentPawn = null;
+        }
     }
 
 

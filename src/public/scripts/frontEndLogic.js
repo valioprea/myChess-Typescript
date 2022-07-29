@@ -1,5 +1,17 @@
 const socket = io("ws://localhost:3000");
 
+
+//Hey server, would you start the game?
+function startGame(){
+    socket.emit("startGame");
+}
+
+//Initialize visual pieces
+socket.on("initializePieces", (allBackendPieces) => {
+    let allPieces = JSON.parse(allBackendPieces);
+    initializePieces(allPieces);
+})
+
 //TODO: DELETE THIS
 // // ## Use this to allow all square to be moved to
 // let items = document.querySelectorAll(".square");
@@ -20,6 +32,7 @@ const socket = io("ws://localhost:3000");
     
 // }
 
+//Get valid moves of selected piece and color the squares accordingly
 socket.on("validMoves", (allValidMovesBackend)=>{
     JSON.parse(allValidMovesBackend).forEach((position) => {
         let square = document.getElementsByClassName( position.rowPosition )[0].children[position.colPosition-1];
@@ -27,19 +40,15 @@ socket.on("validMoves", (allValidMovesBackend)=>{
         square.addEventListener("drop", drop);
         square.classList.add("attacked"); //change color
     })
-    // changeSquareColor(allValidMovesBackend);
 })
 
 
-//Initialize visual pieces
-socket.on("initializePieces", (allBackendPieces) => {
-    let allPieces = JSON.parse(allBackendPieces);
-    initializePieces(allPieces);
-})
+
 
 
 //DRAG EVENT
 function drag(event) {
+    // debugger
 	event.dataTransfer.setData("pieceIdThatIsMoved", event.target.id); //temporary assign pieceIdThatIsMoved property with value of piece id
     //Send to backend the selected piece
     document.getElementById(event.target.id);
@@ -50,14 +59,6 @@ function drag(event) {
     // console.log("Dragging from position: ",JSON.stringify(position))
     socket.emit("selectPiece", JSON.stringify(position));
 }
-
-
-//ALLOW DROP
-function allowDrop(event){
-    event.preventDefault(); 
-}
-
-
 
 //DROP EVENT
 //This function applies only to the square on which you drop the piece
@@ -73,13 +74,14 @@ function drop(event) {
     //Place visual piece
     placePiece(id, square); //id of piece & square to place on
 
-    //remove event listeners from all squares
-    let items = document.querySelectorAll(".square");
-    items.forEach(function (item) {
-        item.removeEventListener("dragover", allowDrop);
-        item.removeEventListener("drop", drop);
-        item.classList.remove("attacked");
-    });
+        //remove event listeners from all squares
+        let items = document.querySelectorAll(".square");
+        items.forEach(function (item) {
+            item.removeEventListener("dragover", allowDrop);
+            item.removeEventListener("drop", drop);
+            item.classList.remove("attacked");
+        });
+        console.log("dupa debugger")
 
     //Transmit to server what is the target position on which the piece was dropped
     //get square id
@@ -92,13 +94,29 @@ function drop(event) {
     socket.emit("placedPiece", JSON.stringify(targetPosition));
 }
 
+// function dragend(){
+//     //remove event listeners from all squares
+//     let items = document.querySelectorAll(".square");
+//     items.forEach(function (item) {
+//         item.removeEventListener("dragover", allowDrop);
+//         item.removeEventListener("drop", drop);
+//         item.classList.remove("attacked");
+//     });
+//     console.log("dupa debugger")
+// }
 
 
-//Hey server, would you start the game?
-function startGame(){
-    socket.emit("startGame");
+
+
+
+
+
+
+
+//ALLOW DROP
+function allowDrop(event){
+    event.preventDefault(); 
 }
-
 
 //Sanity checks - development purposes
 function checkSanity(){

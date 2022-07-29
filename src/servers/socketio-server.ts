@@ -34,7 +34,7 @@ export class SocketIoServer {
             socket.on("startGame", () => {
                 console.log("game starts");           
                 let allPieces: Piece[] = gameLogic.getAllPieces( gameLogic.getAllSquares());
-                socket.emit("initializePieces", JSON.stringify(allPieces) );
+                socket.emit( "initializePieces", JSON.stringify(allPieces) );
             })
 
 

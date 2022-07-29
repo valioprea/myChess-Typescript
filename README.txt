@@ -6,3 +6,8 @@ To start the server run in bash:
 
 
 npm run dev - to start the actual server running on javascript -> while programming
+
+
+To describe:
+- need for clone: 
+https://www.npmjs.com/package/lodash
