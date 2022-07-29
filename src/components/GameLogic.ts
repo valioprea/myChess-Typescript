@@ -115,7 +115,9 @@ export class GameLogic{
 
 
     public grabPiece(position: Position){
-        this.selectedPiece = this.allSquares[position.getRowPosition()][position.getColPosition()].getPiece();
+        console.log("GAMELOGIC -> grabPiece -> position from FE: ", position)
+        console.log("GAMELOGIC -> grabPiece -> square at position from FE: ",this.allSquares[position.getRowPosition()][position.getColPosition()])
+        this.selectedPiece = this.allSquares[position.getRowPosition()][position.getColPosition()].getPiece()!;
         console.log("GAMELOGIC: this is the position at which I select the piece: ",this.selectedPiece?.getPiecePosition());
         console.log("GAMELOGIC: this is the selected piece: ",this.selectedPiece);
     }
@@ -149,6 +151,7 @@ export class GameLogic{
             this.setGameTurn("white"); //-> white is next
             console.log("White moves now ->");
         }
+        this.ungrabPiece();
     }
 
     // Function that places piece x on position y
@@ -170,11 +173,7 @@ export class GameLogic{
 
         //Assign new coordinates for the recently placed piece
         this.selectedPiece!.setPiecePosition(new Position(targetPosition.getRowPosition(), targetPosition.getColPosition()));
-        
         this.finishTurn();
-        this.ungrabPiece();
-        
-
     }
 
 
@@ -654,14 +653,7 @@ export class GameLogic{
         });
     }
 
-    public getAllAttackedSquaresByOpponent(currentConfiguration: Square[][]) : Position[] {
-        //Aux transformation
-        let opponentColor: string | null = null;
-        if( this.getGameTurn() == "white"){
-            opponentColor = "black";
-        } else {
-            opponentColor = "white";
-        }
+    public getAllAttackedSquaresByOpponent(currentConfiguration: Square[][], opponentColor: string) : Position[] {
 
         let allOpponentPieces: Piece[] = this.getAllPiecesOfThisColor(opponentColor, currentConfiguration);
         let allOpponentPossibleAttacks: Position[] = new Array();
@@ -723,23 +715,109 @@ export class GameLogic{
     public getMovesForThisPiece(currentPiece: Piece, currentConfiguration: Square[][]){
 
         let kinematicMoves: Position[] = new Array();
+        let results: Position[] = new Array();
 
         if (currentPiece.getName() === "rook"){
-            kinematicMoves = this.getRookPositions(currentPiece,currentConfiguration);
-        } else if (currentPiece.getName() === "knight") {
-            kinematicMoves = this.getKnightPositions(currentPiece,currentConfiguration);
-        } else if (currentPiece.getName() === "bishop") {
-            kinematicMoves = this.getBishopPositions(currentPiece,currentConfiguration);
-        } else if (currentPiece.getName() === "queen") {
-            kinematicMoves = this.getQueenPositions(currentPiece,currentConfiguration);
-        } else if (currentPiece.getName() === "king") {
-            kinematicMoves = this.getKingPositions(currentPiece,currentConfiguration);
-        } else if (currentPiece.getName() === "pawn") {
             
+            kinematicMoves = this.getRookPositions(currentPiece,currentConfiguration);
+            results = this.algorithm_legalMovesOfThisPiece(currentPiece, kinematicMoves);
+            // console.log("GAME LOGIC: getMovesForThisPiece (rook): ",kinematicMoves)
+            // return this.algorithm_legalMovesOfThisPiece(currentPiece, kinematicMoves);
+
+        } else if (currentPiece.getName() === "knight") {
+
+            kinematicMoves = this.getKnightPositions(currentPiece,currentConfiguration);
+
+        } else if (currentPiece.getName() === "bishop") {
+
+            kinematicMoves = this.getBishopPositions(currentPiece,currentConfiguration);
+
+        } else if (currentPiece.getName() === "queen") {
+
+            kinematicMoves = this.getQueenPositions(currentPiece,currentConfiguration);
+
+        } else if (currentPiece.getName() === "king") {
+
+            kinematicMoves = this.getKingPositions(currentPiece,currentConfiguration);
+
+        } else if (currentPiece.getName() === "pawn") {
+
         }
-        return kinematicMoves;
+        return results;
     }
 
+    public algorithm_legalMovesOfThisPiece(currentPiece: Piece, currentKinematicMoves: Position[]): Position[] {
+        console.log("GAMELOGIC, algorithm_legalMovesOfThisPiece: currentKinematicMoves: ",currentKinematicMoves)
+        let color: string;
+        let oppositeColor: string;
+        if( this.getGameTurn() == "white"){
+            color = "white";
+            oppositeColor = "black";
+        } else {
+            color = "black";
+            oppositeColor = "white";
+        }
+
+        let legalMovesOfThisPiece: Position[] = new Array();
+
+        //For each position of my piece
+        for ( let position of currentKinematicMoves ) {
+
+            //Create imaginary board - copy the current physical board with all the pieces
+            // let imaginaryBoard = this.getAllSquares();
+            let imaginaryBoard = Object.create(this.getAllSquares());
+            
+            // console.log("DE AICI INCEPE IMAGINARY BOARD",imaginaryBoard[1][1]);
+
+            //GET imaginary piece (the copy of the current piece)
+            let imaginaryPiece: Piece = imaginaryBoard[currentPiece.getPiecePosition().getRowPosition()][currentPiece.getPiecePosition().getColPosition()]!.getPiece()!;
+            // console.log("IMAGINARY PIECE: ",imaginaryPiece)
+            //Place imaginary piece on position j on the imaginary board
+            this.placeImaginaryPieceOnImaginaryBoard(imaginaryPiece, position, imaginaryBoard);
+
+            //GET all attacked positions by opponent - IMAGINARY CONTEXT
+            let dangerZone: Position[] = this.getAllAttackedSquaresByOpponent(imaginaryBoard, oppositeColor);
+
+            //GET all my pieces from the imaginary board
+            let myImaginaryArrangement: Piece[] = this.getAllPiecesOfThisColor(color, imaginaryBoard);
+
+            //Find position of my king in the imaginary board
+            let kingImaginaryPosition: Position;
+            for ( let thisShouldBeKing of myImaginaryArrangement) {
+                if (thisShouldBeKing.getName() === "king"){
+                    kingImaginaryPosition = thisShouldBeKing.getPiecePosition();
+                }
+            }
+
+            //Search algorithm. Is my king in the dangerZone still? aka Is my king in check?
+            for ( let dangerPosition of dangerZone ) {
+                if ( !kingImaginaryPosition!.equals(dangerPosition) ) {
+                    legalMovesOfThisPiece.push(position);
+                }
+            }
+        }
+        return legalMovesOfThisPiece;
+    }
+
+
+    //Function that place the imaginary piece on the imaginary board. Imaginary = copy of real for each kinematic possible position
+    public placeImaginaryPieceOnImaginaryBoard(currentImaginaryPiece: Piece, targetImaginaryPosition: Position, imaginaryBoard: Square[][]) {
+              
+        //Eliminate selected piece from previous square
+        imaginaryBoard[currentImaginaryPiece.getPiecePosition().getRowPosition()][currentImaginaryPiece.getPiecePosition().getColPosition()].eliminatePiece(currentImaginaryPiece);
+
+        //If there is a foe on target square, eliminate the foe!
+        if(imaginaryBoard[targetImaginaryPosition.getRowPosition()][targetImaginaryPosition.getColPosition()].getPiece() !== null ){
+            imaginaryBoard[targetImaginaryPosition.getRowPosition()][targetImaginaryPosition.getColPosition()]
+            .eliminatePiece(imaginaryBoard[targetImaginaryPosition.getRowPosition()][targetImaginaryPosition.getColPosition()].getPiece()!);
+        }
+
+        //Assign selected piece to new square
+        imaginaryBoard[targetImaginaryPosition.getRowPosition()][targetImaginaryPosition.getColPosition()].setPiece(currentImaginaryPiece);
+
+        //Assign new coordinates for the recently placed piece
+        currentImaginaryPiece.setPiecePosition(new Position(targetImaginaryPosition.getRowPosition(), targetImaginaryPosition.getColPosition()));
+    }
 
 
 
