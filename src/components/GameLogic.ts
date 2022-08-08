@@ -189,6 +189,14 @@ export class GameLogic{
             let currentPawn: Pawn | null = this.selectedPiece as Pawn;
             currentPawn.hasMoved(); //->that pawn has moved.
             currentPawn = null;
+        } else if (this.selectedPiece!.getName() === "king") {
+            let currentKing: King | null = this.selectedPiece as King;
+            currentKing.hasMoved();
+            currentKing = null;
+        } else if (this.selectedPiece!.getName() === "rook") {
+            let currentRook: Rook | null = this.selectedPiece as Rook;
+            currentRook.hasMoved();
+            currentRook = null;
         }
 
         this.finishTurn();
@@ -933,13 +941,37 @@ export class GameLogic{
         currentImaginaryPiece.setPiecePosition(new Position(targetImaginaryPosition.getRowPosition(), targetImaginaryPosition.getColPosition()));
 
         //Was that piece a pawn?
-        if (currentImaginaryPiece.getName() === "pawn"){
-            let currentPawn: Pawn | null = currentImaginaryPiece as Pawn;
+        if (this.selectedPiece!.getName() === "pawn"){
+            let currentPawn: Pawn | null = this.selectedPiece as Pawn;
             currentPawn.hasMoved(); //->that pawn has moved.
             currentPawn = null;
+        } else if (this.selectedPiece!.getName() === "king") {
+            let currentKing: King | null = this.selectedPiece as King;
+            currentKing.hasMoved();
+            currentKing = null;
+        } else if (this.selectedPiece!.getName() === "rook") {
+            let currentRook: Rook | null = this.selectedPiece as Rook;
+            currentRook.hasMoved();
+            currentRook = null;
         }
     }
 
+
+    //IS my king in check?
+    public isMyKingInCheck(){
+        let color: string;
+        let oppositeColor: string;
+        if( this.getGameTurn() == "white"){
+            color = "white";
+            oppositeColor = "black";
+        } else {
+            color = "black";
+            oppositeColor = "white";
+        }
+
+
+        
+    }
 
 
     //DEVELOPMENT FUNCTIONS

@@ -5,6 +5,7 @@ To start the server run in bash:
 (1. npm run start -> ruleaza aplicatia mea care a fost facuta in javascript) -> la final de proiectul
 
 
+//HOW TO START THE APP:
 npm run dev - to start the actual server running on javascript -> while programming
 
 
