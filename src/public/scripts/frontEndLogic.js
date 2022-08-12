@@ -50,6 +50,13 @@ socket.on("validMoves", (allValidMovesBackend)=>{
 function drag(event) {
     // debugger
 	event.dataTransfer.setData("pieceIdThatIsMoved", event.target.id); //temporary assign pieceIdThatIsMoved property with value of piece id
+
+    event.dataTransfer.setData("pieceName", event.target.dataset.pieceName);
+    event.dataTransfer.setData("pieceColor", event.target.dataset.color);
+    event.dataTransfer.setData("rowPos", event.target.dataset.rowPosition);
+    event.dataTransfer.setData("colPos", event.target.dataset.colPosition);
+    event.dataTransfer.setData("hasMoved", event.target.dataset.hasMoved);
+
     //Send to backend the selected piece
     document.getElementById(event.target.id);
     let position = {
@@ -71,8 +78,15 @@ function drop(event) {
     event.preventDefault();
 	let id = event.dataTransfer.getData("pieceIdThatIsMoved"); //get transferred piece ID
 
+    let pieceName = event.dataTransfer.getData("pieceName");
+    let color = event.dataTransfer.getData("pieceColor");
+    let rowPos = event.dataTransfer.getData("rowPos");
+    let colPos = event.dataTransfer.getData("colPos");
+    let hasMoved = event.dataTransfer.getData("hasMoved");
+
+
     //Place visual piece
-    placePiece(id, square); //id of piece & square to place on
+    placePiece(id, square, pieceName, color, rowPos, colPos, hasMoved); //id of piece & square to place on
 
         //remove event listeners from all squares
         let items = document.querySelectorAll(".square");
