@@ -1,4 +1,6 @@
+import { King } from "./individualPieces/King";
 import { Pawn } from "./individualPieces/Pawn";
+import { Rook } from "./individualPieces/Rook";
 import { Piece } from "./Piece";
 import { Position } from "./Position";
 import { Square } from "./Square";
@@ -33,8 +35,8 @@ export class Kinematics {
     }
 
 
-     // **********  COMPUTATIONAL FUNCTIONS - KINEMATIC PURPOSES **************************
-    public getRookPositions(currentRook: Piece, currentConfiguration: Square[][]){
+         // **********  COMPUTATIONAL FUNCTIONS - KINEMATIC PURPOSES **************************
+        public getRookPositions(currentRook: Piece, currentConfiguration: Square[][]){
             let currentPosition: Position = currentRook.getPiecePosition();
             let targets: Position[] = new Array();
     
@@ -119,7 +121,7 @@ export class Kinematics {
             }
     
             return targets;
-    }
+        }
     
         public getKnightPositions(currentKnight: Piece, currentConfiguration: Square[][]){
             let targets: Position[] = new Array();
@@ -627,4 +629,108 @@ export class Kinematics {
             return allOpponentPossibleAttacks;
         }
         // *******END  COMPUTATIONAL FUNCTIONS - KINEMATIC PURPOSES **************************
+
+
+
+    //*** SPECIAL MOVES */
+
+    //CASTLING
+    public getAvailableCastlingPositions(currentKing: King, currentConfiguration: Square[][], kingInCheck: boolean, oppositeColor: string): Position[]{
+        let validCastleMoves: Position[] = new Array();
+        //Was the king moved AND is it in check ?
+        if ( currentKing.getWasMoved() === false && kingInCheck === false ) {
+            //Is the king white or black?
+            if ( currentKing.getColor() === "white" ){
+                //ALGORITHM AUX CASTLING
+                let availableCastlingPositions = this.algorithm_auxCastling(currentConfiguration, currentKing, oppositeColor, 8);
+                for ( let pos of availableCastlingPositions ) {
+                    validCastleMoves.push(pos);
+                }
+            } else {
+                //The king is black
+                //ALGORITHM AUX CASTLING
+                let availableCastlingPositions = this.algorithm_auxCastling(currentConfiguration, currentKing, oppositeColor, 1);
+                for ( let pos of availableCastlingPositions ) {
+                    validCastleMoves.push(pos);
+                }
+            }
+        }
+        return validCastleMoves;
+    }
+    //auxiliary function
+    public algorithm_auxCastling(currentConfiguration: Square[][], currentKing: Piece, oppositeColor: string, rowIndex: number) {
+        let castlingPositions: Position[] = new Array();
+        //TODO: to rethink this
+        //Does the eastern square contain a piece?
+        if ( currentConfiguration[rowIndex][8].getPiece() !== null ) {
+
+            // Is that piece a rook AND of the same color ?
+            if( currentConfiguration[rowIndex][8].getPiece()!.getName() === "rook" && currentConfiguration[rowIndex][8].getPiece()!.getColor() === currentKing.getColor() ) {
+                let easternRook = currentConfiguration[rowIndex][8].getPiece() as Rook;
+
+                //Did the rook move?
+                if (easternRook.getWasMoved() === false) {
+
+                    //EAST
+                    //Are those two squares empty ?
+                    if ( currentConfiguration[rowIndex][6].getPiece() === null && currentConfiguration[rowIndex][7].getPiece() === null ) {
+
+                        //Are those two squares attacked by opponent ?
+                        let dangerZone: Position[] = this.getAllAttackedSquaresByOpponent(currentConfiguration, oppositeColor);
+                        let index1 = 0;
+                        for ( let dangerPosition of dangerZone ) {
+                            if ( currentConfiguration[rowIndex][6].getSquarePosition().equals(dangerPosition) ) {
+                                index1 ++;
+                            }
+                        }
+                        let index2 = 0;
+                        for ( let dangerPosition of dangerZone ) {
+                            if ( currentConfiguration[rowIndex][7].getSquarePosition().equals(dangerPosition) ) {
+                                index2 ++;
+                            }
+                        }
+                        if (index1 === 0 && index2 === 0) {
+                            castlingPositions.push( new Position(rowIndex,7));
+                        }
+
+                    }
+                    //WEST
+                    //Are those three squares empty ?
+                    if ( currentConfiguration[rowIndex][4].getPiece() === null && currentConfiguration[rowIndex][3].getPiece() === null && currentConfiguration[rowIndex][2].getPiece() === null ) {
+                        //Are those three squares attacked by opponent ?
+                        let dangerZone: Position[] = this.getAllAttackedSquaresByOpponent(currentConfiguration, oppositeColor);
+                        let index1 = 0;
+                        for ( let dangerPosition of dangerZone ) {
+                            if ( currentConfiguration[rowIndex][4].getSquarePosition().equals(dangerPosition) ) {
+                                index1 ++;
+                            }
+                        }
+                        let index2 = 0;
+                        for ( let dangerPosition of dangerZone ) {
+                            if ( currentConfiguration[rowIndex][3].getSquarePosition().equals(dangerPosition) ) {
+                                index2 ++;
+                            }
+                        }
+                        let index3 = 0;
+                        for ( let dangerPosition of dangerZone ) {
+                            if ( currentConfiguration[rowIndex][2].getSquarePosition().equals(dangerPosition) ) {
+                                index3 ++;
+                            }
+                        }
+                        if (index1 === 0 && index2 === 0 && index3 === 0) {
+                            castlingPositions.push( new Position(rowIndex,3));
+                        }
+
+                    }
+                }
+
+            }
+        }
+        return castlingPositions;
+    }
+
+
+
+
+
 }
