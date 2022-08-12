@@ -635,10 +635,9 @@ export class Kinematics {
     //*** SPECIAL MOVES */
 
     //CASTLING
-    public getAvailableCastlingPositions(currentKing: King, currentConfiguration: Square[][], kingInCheck: boolean, oppositeColor: string): Position[]{
+    public getAvailableCastlingPositions(currentKing: King, currentConfiguration: Square[][], oppositeColor: string): Position[]{
         let validCastleMoves: Position[] = new Array();
-        //Was the king moved AND is it in check ?
-        if ( currentKing.getWasMoved() === false && kingInCheck === false ) {
+
             //Is the king white or black?
             if ( currentKing.getColor() === "white" ){
                 //ALGORITHM AUX CASTLING
@@ -654,13 +653,14 @@ export class Kinematics {
                     validCastleMoves.push(pos);
                 }
             }
-        }
         return validCastleMoves;
     }
     //auxiliary function
     public algorithm_auxCastling(currentConfiguration: Square[][], currentKing: Piece, oppositeColor: string, rowIndex: number) {
         let castlingPositions: Position[] = new Array();
         //TODO: to rethink this
+
+        // EAST
         //Does the eastern square contain a piece?
         if ( currentConfiguration[rowIndex][8].getPiece() !== null ) {
 
@@ -671,7 +671,6 @@ export class Kinematics {
                 //Did the rook move?
                 if (easternRook.getWasMoved() === false) {
 
-                    //EAST
                     //Are those two squares empty ?
                     if ( currentConfiguration[rowIndex][6].getPiece() === null && currentConfiguration[rowIndex][7].getPiece() === null ) {
 
@@ -692,9 +691,24 @@ export class Kinematics {
                         if (index1 === 0 && index2 === 0) {
                             castlingPositions.push( new Position(rowIndex,7));
                         }
-
                     }
-                    //WEST
+                    
+                }
+
+            }
+        }
+        
+        // WEST
+        //Does the western square contain a piece?
+        if ( currentConfiguration[rowIndex][1].getPiece() !== null ) {
+
+            // Is that piece a rook AND of the same color ?
+            if( currentConfiguration[rowIndex][1].getPiece()!.getName() === "rook" && currentConfiguration[rowIndex][1].getPiece()!.getColor() === currentKing.getColor() ) {
+                let westernRook = currentConfiguration[rowIndex][1].getPiece() as Rook;
+
+                //Did the rook move?
+                if (westernRook.getWasMoved() === false) {
+
                     //Are those three squares empty ?
                     if ( currentConfiguration[rowIndex][4].getPiece() === null && currentConfiguration[rowIndex][3].getPiece() === null && currentConfiguration[rowIndex][2].getPiece() === null ) {
                         //Are those three squares attacked by opponent ?
@@ -722,10 +736,14 @@ export class Kinematics {
                         }
 
                     }
+                    
                 }
 
             }
         }
+
+
+
         return castlingPositions;
     }
 

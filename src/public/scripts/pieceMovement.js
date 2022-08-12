@@ -198,7 +198,7 @@ function placePiece(pieceId, targetSquare, pieceName, color, rowPos, colPos, has
     document.getElementById(pieceId).dataset.rowPosition = rowPosition;
     document.getElementById(pieceId).dataset.colPosition = colPosition;
 
-
+//TODO: i need to clarify when I just move and when I castle on the FE
     //Is the player castling ?
     if ( pieceName === "king" && hasMoved === "false"){
 
@@ -206,14 +206,14 @@ function placePiece(pieceId, targetSquare, pieceName, color, rowPos, colPos, has
         //If king is white
         if ( color === "white" ) {
             //PLACE EASTERN ROOK
-            if( rowPosition === 8 && colPosition === 7) {
+            if( rowPosition === 8 && colPosition === 7 ) {
                 document.getElementById(86).appendChild( document.getElementById(88).querySelector("IMG") ); //assign rook image
                 document.getElementById(86).querySelector("IMG").dataset.rowPosition = 8;
                 document.getElementById(86).querySelector("IMG").dataset.colPosition = 6;
                 document.getElementById(87).querySelector("IMG").dataset.hasMoved = "true";
             }
             //PLACE WESTERN ROOK
-            if( rowPosition === 8 && colPosition === 3) {
+            if( rowPosition === 8 && colPosition === 3 ) {
                 document.getElementById(84).appendChild( document.getElementById(81).querySelector("IMG") ) //assign rook image
                 document.getElementById(84).querySelector("IMG").dataset.rowPosition = 8;
                 document.getElementById(84).querySelector("IMG").dataset.colPosition = 4;
@@ -221,14 +221,14 @@ function placePiece(pieceId, targetSquare, pieceName, color, rowPos, colPos, has
             }
         } else if (color === "black") {
             //PLACE EASTERN ROOK
-            if( rowPosition === 1 && colPosition === 7) {
+            if( rowPosition === 1 && colPosition === 7 ) {
                 document.getElementById(16).appendChild( document.getElementById(18).querySelector("IMG") ); //assign rook image
                 document.getElementById(16).querySelector("IMG").dataset.rowPosition = 1;
                 document.getElementById(16).querySelector("IMG").dataset.colPosition = 6;
                 document.getElementById(17).querySelector("IMG").dataset.hasMoved = "true";
             }
             //PLACE WESTERN ROOK
-            if( rowPosition === 1 && colPosition === 3) {
+            if( rowPosition === 1 && colPosition === 3 ) {
                 document.getElementById(14).appendChild( document.getElementById(11).querySelector("IMG") ) //assign rook image
                 document.getElementById(14).querySelector("IMG").dataset.rowPosition = 1;
                 document.getElementById(14).querySelector("IMG").dataset.colPosition = 4;
@@ -237,4 +237,16 @@ function placePiece(pieceId, targetSquare, pieceName, color, rowPos, colPos, has
         }
 
     }
+
+
+    //Need to set has moved for IMGs
+    if (pieceName === "pawn"){
+        document.getElementById(pieceId).dataset.hasMoved = "true";
+    } else if (pieceName === "king") {
+        document.getElementById(pieceId).dataset.hasMoved = "true";
+    } else if (pieceName === "rook") {
+        document.getElementById(pieceId).dataset.hasMoved = "true";
+    }
+
+
 }

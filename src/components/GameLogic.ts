@@ -327,13 +327,19 @@ export class GameLogic{
 
 
         //Special moves - king castling
+        //Is my piece a king?
         if (currentPiece.getName() === "king" ){
             let currentKing = currentPiece as King;
+
+            // Was the king moved ?
             if(currentKing.getWasMoved() === false){
-                let kingInCheck = this.isMyKingInCheck(currentKing, currentConfiguration);
-                let availableCastlingPositions = this.kinematics.getAvailableCastlingPositions(currentKing, currentConfiguration, kingInCheck, oppositeColor);
-                for(let pos of availableCastlingPositions){
-                    legalMovesOfThisPiece.push(pos);
+
+                //Is the king in check?
+                if ( this.isMyKingInCheck(currentKing, currentConfiguration) === false ) {
+                    let availableCastlingPositions = this.kinematics.getAvailableCastlingPositions(currentKing, currentConfiguration, oppositeColor);
+                    for(let pos of availableCastlingPositions){
+                        legalMovesOfThisPiece.push(pos);
+                    }
                 }
             }
         }
