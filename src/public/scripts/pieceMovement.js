@@ -198,7 +198,6 @@ function placePiece(pieceId, targetSquare, pieceName, color, rowPos, colPos, has
     document.getElementById(pieceId).dataset.rowPosition = rowPosition;
     document.getElementById(pieceId).dataset.colPosition = colPosition;
 
-//TODO: i need to clarify when I just move and when I castle on the FE
     //Is the player castling ?
     if ( pieceName === "king" && hasMoved === "false"){
 
