@@ -23,6 +23,12 @@ socket.on("validMoves", (allValidMovesBackend)=>{
     })
 })
 
+//Display winner
+socket.on("showWinner", (data) => {
+    console.log(data)
+    document.getElementById("winner").innerHTML = data;
+})
+
 
 //DRAG EVENT
 function drag(event) {
