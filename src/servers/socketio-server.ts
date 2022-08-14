@@ -51,6 +51,10 @@ export class SocketIoServer {
             socket.on("placedPiece", (targetPosition) => {
                 let {rowPosition, colPosition} = JSON.parse(targetPosition);
                 gameLogic.placePiece(new Position(rowPosition,colPosition));
+                console.log("************")
+                console.log(gameLogic.getWinner())
+                console.log("************")
+                socket.emit("showWinner", JSON.stringify( gameLogic.getWinner() ));
             })
 
 

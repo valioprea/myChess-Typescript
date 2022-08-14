@@ -57,32 +57,32 @@ export class GameLogic{
     //This function will initialize pieces on start position
     public initializePieces() {
         //white pieces
-        this.allSquares[8][1].setPiece(new Rook("rook", true, "white", new Position(8,1)));
-        this.allSquares[8][8].setPiece(new Rook("rook", true, "white", new Position(8,8)));
-        this.allSquares[8][2].setPiece(new Knight("knight", true, "white", new Position(8,2)));
-        this.allSquares[8][7].setPiece(new Knight("knight", true, "white", new Position(8,7)));
-        this.allSquares[8][3].setPiece(new Bishop("bishop", true, "white", new Position(8,3)));
-        this.allSquares[8][6].setPiece(new Bishop("bishop", true, "white", new Position(8,6)));
+        // this.allSquares[8][1].setPiece(new Rook("rook", true, "white", new Position(8,1)));
+        // this.allSquares[8][8].setPiece(new Rook("rook", true, "white", new Position(8,8)));
+        // this.allSquares[8][2].setPiece(new Knight("knight", true, "white", new Position(8,2)));
+        // this.allSquares[8][7].setPiece(new Knight("knight", true, "white", new Position(8,7)));
+        // this.allSquares[8][3].setPiece(new Bishop("bishop", true, "white", new Position(8,3)));
+        // this.allSquares[8][6].setPiece(new Bishop("bishop", true, "white", new Position(8,6)));
         this.allSquares[8][4].setPiece(new Queen("queen", true, "white", new Position(8,4)));
         this.allSquares[8][5].setPiece(new King("king", true, "white", new Position(8,5)));
-        for(let i=1; i<=8; i++){
-            this.allSquares[7][i].setPiece(new Pawn("pawn", true, "white", new Position(7,i)));
-        }
+        // for(let i=1; i<=8; i++){
+        //     this.allSquares[7][i].setPiece(new Pawn("pawn", true, "white", new Position(7,i)));
+        // }
 
         
 
         //black pieces
-        this.allSquares[1][1].setPiece(new Rook("rook", false, "black", new Position(1,1)));
-        this.allSquares[1][8].setPiece(new Rook("rook", false, "black", new Position(1,8)));
-        this.allSquares[1][2].setPiece(new Knight("knight", false, "black", new Position(1,2)));
-        this.allSquares[1][7].setPiece(new Knight("knight", false, "black", new Position(1,7)));
-        this.allSquares[1][3].setPiece(new Bishop("bishop", false, "black", new Position(1,3)));
-        this.allSquares[1][6].setPiece(new Bishop("bishop", false, "black", new Position(1,6)));
-        this.allSquares[1][4].setPiece(new Queen("queen", false, "black", new Position(1,4)));
+        // this.allSquares[1][1].setPiece(new Rook("rook", false, "black", new Position(1,1)));
+        // this.allSquares[1][8].setPiece(new Rook("rook", false, "black", new Position(1,8)));
+        // this.allSquares[1][2].setPiece(new Knight("knight", false, "black", new Position(1,2)));
+        // this.allSquares[1][7].setPiece(new Knight("knight", false, "black", new Position(1,7)));
+        // this.allSquares[1][3].setPiece(new Bishop("bishop", false, "black", new Position(1,3)));
+        // this.allSquares[1][6].setPiece(new Bishop("bishop", false, "black", new Position(1,6)));
+        // this.allSquares[1][4].setPiece(new Queen("queen", false, "black", new Position(1,4)));
         this.allSquares[1][5].setPiece(new King("king", false, "black", new Position(1,5)));
-        for(let i=1; i<=8; i++){
-            this.allSquares[2][i].setPiece(new Pawn("pawn", false, "black", new Position(2,i)));
-        }
+        // for(let i=1; i<=8; i++){
+        //     this.allSquares[2][i].setPiece(new Pawn("pawn", false, "black", new Position(2,i)));
+        // }
     }
 
     //This function should deal with game turn
@@ -118,6 +118,7 @@ export class GameLogic{
             }
             this.setGameTurn("black"); //-> black is next
             canMove = this.canOpponentMoveAnywhere("black");
+            this.checkForWinner("black", canMove);
             console.log("Black moves now ->");
         } else {
             //black finished the turn
@@ -130,12 +131,42 @@ export class GameLogic{
             }
             this.setGameTurn("white"); //-> white is next
             canMove = this.canOpponentMoveAnywhere("white");
+            this.checkForWinner("white", canMove);
             console.log("White moves now ->");
         }
         this.ungrabPiece();
     }
 
-    public checkForWinner(opponentColor: string){
+    public checkForWinner(opponentColor: string, canOpponentMove: boolean){
+
+        let myColor: string = "";
+        if ( opponentColor === "white" ) {
+            myColor = "black";
+        } else if (opponentColor === "black") {
+            myColor = "white";
+        }
+
+        //Find opponent king
+        let opponentPieces: Piece[] = this.kinematics.getAllPiecesOfThisColor(opponentColor, this.allSquares);
+        let opponentKing: King ;
+        for( let piece of opponentPieces ) {
+            if ( piece.getName() === "king" ) {
+                opponentKing = piece as King;
+            }
+        }
+
+        //checkmate = can't move + king in check
+        if ( this.isMyKingInCheck( opponentKing! , this.allSquares) === true && canOpponentMove === false ) {
+            this.winner = myColor + " WINS THE GAME"
+
+            //stalemate = can't move
+        } else if ( this.isMyKingInCheck( opponentKing! , this.allSquares) === false && canOpponentMove === false ) {
+            this.winner = myColor + " CREATED A STALEMATE"
+
+            //default case
+        } else {
+            this.winner = " NO WINNER YET"
+        }
 
     }
 
@@ -479,6 +510,7 @@ export class GameLogic{
 
     //Can opponent move anywhere?
     public canOpponentMoveAnywhere(color: string): boolean {
+        
         let answer: boolean = false;
 
         let allOpponentPieces: Piece[] = this.kinematics.getAllPiecesOfThisColor(color, this.allSquares);
@@ -491,10 +523,10 @@ export class GameLogic{
             }
         }
 
-        if ( allMoves.length > 0 ){
-            answer = false;
+        if ( allMoves.length !== 0 ){
+            answer = true;
         } else {
-            answer =  true;
+            answer =  false;
         }
 
         return answer;
