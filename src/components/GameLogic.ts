@@ -12,10 +12,19 @@ const _ = require('lodash');
 
 export class GameLogic{
 
-    public kinematics: Kinematics = new Kinematics();
+    private kinematics: Kinematics = new Kinematics();
     public allSquares: Square[][] = new Array();
     public selectedPiece: Piece | null = null; //not sure about the ? thing.
     public gameTurn: String | null = null;
+    private winner: String = "";
+
+    public getWinner(){
+        return this.winner;
+    }
+
+    public getKinematics(): Kinematics {
+        return this.kinematics;
+    }
 
     public getSelectedPiece(): Piece | null{
         return this.selectedPiece;
@@ -82,24 +91,6 @@ export class GameLogic{
         this.setGameTurn("white");
     }
 
-    
-    //Function that will return all pieces from the board, at a given point in time
-    public getAllPieces(currentConfiguration: Square[][]): Piece[]{
-        let allPieces: Piece[] = new Array();
-        for(let i = 1; i<=8; i++){
-            for(let j = 1; j<=8; j++){
-                //Does this square contain a piece ?
-                if (  currentConfiguration[i][j].getPiece() != null){
-                    //Attach that piece to this list:
-                    allPieces.push(currentConfiguration[i][j].getPiece()!);
-                
-                }
-            }
-        }
-        return allPieces;
-    }
-
-
     public grabPiece(position: Position){
         // console.log("GAMELOGIC -> grabPiece -> position from FE: ", position)
         // console.log("GAMELOGIC -> grabPiece -> square at position from FE: ",this.allSquares[position.getRowPosition()][position.getColPosition()])
@@ -113,6 +104,8 @@ export class GameLogic{
     }
 
     public finishTurn() {
+        let canMove: boolean = false;
+
         //Who did finish the turn ?
         if( this.selectedPiece!.getColor() == "white" ){
             //white finished the turn
@@ -124,6 +117,7 @@ export class GameLogic{
                 piece.setCanBeMoved(true);
             }
             this.setGameTurn("black"); //-> black is next
+            canMove = this.canOpponentMoveAnywhere("black");
             console.log("Black moves now ->");
         } else {
             //black finished the turn
@@ -135,34 +129,45 @@ export class GameLogic{
                 piece.setCanBeMoved(true);
             }
             this.setGameTurn("white"); //-> white is next
+            canMove = this.canOpponentMoveAnywhere("white");
             console.log("White moves now ->");
         }
         this.ungrabPiece();
     }
 
+    public checkForWinner(opponentColor: string){
+
+    }
+
     // Function that places piece x on position y
     public placePiece(targetPosition: Position) {
         
-        //Here i don't need to ask myself if I am hovering over a friendly piece since I am setting event triggers on valid squares only.
-
-        //Eliminate selected piece from previous square
-        this.allSquares[this.selectedPiece!.getPiecePosition().getRowPosition()][this.selectedPiece!.getPiecePosition().getColPosition()].eliminatePiece(this.selectedPiece!);
-
-        //If there is a foe on target square, eliminate the foe!
-        if(this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].getPiece() !== null ){
-            this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()]
-            .eliminatePiece(this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].getPiece()!);
-        }
-
-        //Assign selected piece to new square
-        this.getAllSquares()[targetPosition.getRowPosition()][targetPosition.getColPosition()].setPiece(this.selectedPiece!);
-
-        //Assign new coordinates for the recently placed piece
-        this.selectedPiece!.setPiecePosition(new Position(targetPosition.getRowPosition(), targetPosition.getColPosition()));
-
         //Was that piece a pawn?
         if (this.selectedPiece!.getName() === "pawn"){
             let currentPawn: Pawn | null = this.selectedPiece as Pawn;
+
+            //En passant logic
+            //Is the target square eastern and does not contain a piece ?
+            if ( (targetPosition.getColPosition() === currentPawn.getPiecePosition().getColPosition() + 1) &&
+                this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].getPiece() === null ) {
+                    //enPassant is happening
+                    //Eliminate opponent's pawn
+                    this.allSquares[currentPawn.getPiecePosition().getRowPosition()][currentPawn.getPiecePosition().getColPosition() + 1]
+                        .eliminatePiece( this.allSquares[currentPawn.getPiecePosition().getRowPosition()][currentPawn.getPiecePosition().getColPosition() + 1].getPiece()! );
+                }
+            //Is the target square western and does not contain a piece ?
+            if ( (targetPosition.getColPosition() === currentPawn.getPiecePosition().getColPosition() - 1) &&
+                this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].getPiece() === null ) {
+                    //enPassant is happening
+                    //Eliminate opponent's pawn
+                    this.allSquares[currentPawn.getPiecePosition().getRowPosition()][currentPawn.getPiecePosition().getColPosition() - 1]
+                        .eliminatePiece( this.allSquares[currentPawn.getPiecePosition().getRowPosition()][currentPawn.getPiecePosition().getColPosition() - 1].getPiece()! );
+                }
+
+            let rowDiff: number = Math.abs( this.selectedPiece!.getPiecePosition().getRowPosition() - targetPosition.getRowPosition() );
+            currentPawn.setNumberOfSquaresMovedLast(rowDiff);
+
+
             currentPawn.hasMoved(); //->that pawn has moved.
             currentPawn = null;
         } else if (this.selectedPiece!.getName() === "king") {
@@ -187,6 +192,32 @@ export class GameLogic{
             currentRook.hasMoved();
             currentRook = null;
         }
+
+
+        //Here i don't need to ask myself if I am hovering over a friendly piece since I am setting event triggers on valid squares only.
+
+        //Eliminate selected piece from previous square
+        this.allSquares[this.selectedPiece!.getPiecePosition().getRowPosition()][this.selectedPiece!.getPiecePosition().getColPosition()].eliminatePiece(this.selectedPiece!);
+
+        //If there is a foe on target square, eliminate the foe!
+        if(this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].getPiece() !== null ){
+            this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()]
+            .eliminatePiece(this.allSquares[targetPosition.getRowPosition()][targetPosition.getColPosition()].getPiece()!);
+        }
+
+        //Assign selected piece to new square
+        this.getAllSquares()[targetPosition.getRowPosition()][targetPosition.getColPosition()].setPiece(this.selectedPiece!);
+
+        //Assign new coordinates for the recently placed piece
+        this.selectedPiece!.setPiecePosition(new Position(targetPosition.getRowPosition(), targetPosition.getColPosition()));
+
+        //Set false to last piece moved for all pieces (just to clean)
+        for( let piece of this.kinematics.getAllPieces(this.allSquares) ){
+            piece.setLastPieceMoved(false);
+        }
+
+        //Set true to last moved piece - the selected piece.
+        this.selectedPiece!.setLastPieceMoved(true);
 
         this.finishTurn();
     }
@@ -231,15 +262,18 @@ export class GameLogic{
         }
     }
 
-
-
-
-
-
     public getMovesForThisPiece(currentPiece: Piece, currentConfiguration: Square[][]){
 
         let kinematicMoves: Position[] = new Array();
         let results: Position[] = new Array();
+
+        //Extra logic, finding the last moved piece
+        let lastPieceMoved: Piece | null;
+        for (let piece of this.kinematics.getAllPieces(currentConfiguration)){
+            if( piece.getLastPieceMoved() === true ) {
+                lastPieceMoved = piece;
+            }
+        }
 
         if (currentPiece.getName() === "rook"){
             
@@ -263,7 +297,7 @@ export class GameLogic{
             
         } else if (currentPiece.getName() === "pawn") {
             
-            kinematicMoves = this.kinematics.getPawnPositions(currentPiece as Pawn,currentConfiguration);
+            kinematicMoves = this.kinematics.getPawnPositions(currentPiece as Pawn, currentConfiguration, lastPieceMoved! );
 
         }
         results = this.algorithm_legalMovesOfThisPiece(currentPiece, kinematicMoves, currentConfiguration);
@@ -326,7 +360,7 @@ export class GameLogic{
         }
 
 
-        //Special moves - king castling
+        //Special move - king castling
         //Is my piece a king?
         if (currentPiece.getName() === "king" ){
             let currentKing = currentPiece as King;
@@ -346,10 +380,46 @@ export class GameLogic{
         return legalMovesOfThisPiece;
     }
 
-
     //Function that places the imaginary piece on the imaginary board. Imaginary = copy of real for each kinematic possible position
     public placeImaginaryPieceOnImaginaryBoard(currentImaginaryPiece: Piece, targetImaginaryPosition: Position, imaginaryBoard: Square[][]) {
               
+        //Was that piece a pawn?
+        if (currentImaginaryPiece.getName() === "pawn"){
+            let currentPawn: Pawn | null = currentImaginaryPiece as Pawn;
+
+            //En passant logic
+            //Is the target square eastern and does not contain a piece ?
+            if ( (targetImaginaryPosition.getColPosition() === currentImaginaryPiece.getPiecePosition().getColPosition() + 1) &&
+                imaginaryBoard[targetImaginaryPosition.getRowPosition()][targetImaginaryPosition.getColPosition()].getPiece() === null ) {
+                    //enPassant is happening
+                    //Eliminate opponent's pawn
+                    imaginaryBoard[currentImaginaryPiece.getPiecePosition().getRowPosition()][currentImaginaryPiece.getPiecePosition().getColPosition() + 1]
+                        .eliminatePiece( imaginaryBoard[currentImaginaryPiece.getPiecePosition().getRowPosition()][currentImaginaryPiece.getPiecePosition().getColPosition() + 1].getPiece()! );
+                }
+            //Is the target square western and does not contain a piece ?
+            if ( (targetImaginaryPosition.getColPosition() === currentImaginaryPiece.getPiecePosition().getColPosition() - 1) &&
+                imaginaryBoard[targetImaginaryPosition.getRowPosition()][targetImaginaryPosition.getColPosition()].getPiece() === null ) {
+                    //enPassant is happening
+                    //Eliminate opponent's pawn
+                    imaginaryBoard[currentImaginaryPiece.getPiecePosition().getRowPosition()][currentImaginaryPiece.getPiecePosition().getColPosition() - 1]
+                        .eliminatePiece( imaginaryBoard[currentImaginaryPiece.getPiecePosition().getRowPosition()][currentImaginaryPiece.getPiecePosition().getColPosition() - 1].getPiece()! );
+                }
+
+            let rowDiff: number = Math.abs( currentImaginaryPiece.getPiecePosition().getRowPosition() - targetImaginaryPosition.getRowPosition() );
+            currentPawn.setNumberOfSquaresMovedLast(rowDiff);
+
+            currentPawn.hasMoved(); //->that pawn has moved.
+            currentPawn = null;
+        } else if (currentImaginaryPiece.getName() === "king") {
+            let currentKing: King | null = currentImaginaryPiece as King;
+            currentKing.hasMoved();
+            currentKing = null;
+        } else if (currentImaginaryPiece.getName() === "rook") {
+            let currentRook: Rook | null = currentImaginaryPiece as Rook;
+            currentRook.hasMoved();
+            currentRook = null;
+        }
+
         //Eliminate selected piece from previous square
         imaginaryBoard[currentImaginaryPiece.getPiecePosition().getRowPosition()][currentImaginaryPiece.getPiecePosition().getColPosition()].eliminatePiece(currentImaginaryPiece);
 
@@ -365,22 +435,16 @@ export class GameLogic{
         //Assign new coordinates for the recently placed piece
         currentImaginaryPiece.setPiecePosition(new Position(targetImaginaryPosition.getRowPosition(), targetImaginaryPosition.getColPosition()));
 
-        //Was that piece a pawn?
-        if (currentImaginaryPiece.getName() === "pawn"){
-            let currentPawn: Pawn | null = currentImaginaryPiece as Pawn;
-            currentPawn.hasMoved(); //->that pawn has moved.
-            currentPawn = null;
-        } else if (currentImaginaryPiece.getName() === "king") {
-            let currentKing: King | null = currentImaginaryPiece as King;
-            currentKing.hasMoved();
-            currentKing = null;
-        } else if (currentImaginaryPiece.getName() === "rook") {
-            let currentRook: Rook | null = currentImaginaryPiece as Rook;
-            currentRook.hasMoved();
-            currentRook = null;
+        //Set false to last piece moved for all pieces (just to clean)
+        for( let piece of this.kinematics.getAllPieces(imaginaryBoard) ){
+            piece.setLastPieceMoved(false);
         }
-    }
 
+        //Set true to last moved piece - the selected piece.
+        currentImaginaryPiece!.setLastPieceMoved(true);
+
+
+    }
 
     //IS my king in check?
     public isMyKingInCheck(currentKing: King, currentConfiguration: Square[][]): boolean{
@@ -413,17 +477,43 @@ export class GameLogic{
         }
     }
 
+    //Can opponent move anywhere?
+    public canOpponentMoveAnywhere(color: string): boolean {
+        let answer: boolean = false;
+
+        let allOpponentPieces: Piece[] = this.kinematics.getAllPiecesOfThisColor(color, this.allSquares);
+        let allMoves: Position[] = new Array();
+
+        for (let piece of allOpponentPieces) {
+            let pieceMoves: Position[] = this.getMovesForThisPiece(piece, this.allSquares)
+            for (let move of pieceMoves) {
+                allMoves.push(move);
+            }
+        }
+
+        if ( allMoves.length > 0 ){
+            answer = false;
+        } else {
+            answer =  true;
+        }
+
+        return answer;
+    }
+
 
     //DEVELOPMENT FUNCTIONS
     public sanityCheck(){
         //Will print on the console all info that the server board contains.
-        console.log("******************** SANITY CHECK BOARD SQUARES AND PIECES ********************************")
+        console.log("*******************************************************************************************")
+        console.log("**                      SANITY CHECK BOARD SQUARES AND PIECES                            **")
+        console.log("*******************************************************************************************")
         for( let i=1; i<=8; i++){
             for( let j=1; j<=8; j++){
                 console.log(this.allSquares[i][j]);
             }
         }
-        console.log("*****************END SANITY CHECK BOARD SQUARES AND PIECES ********************************")
+        console.log("*******************************************************************************************")
+        console.log("**                  END SANITY CHECK BOARD SQUARES AND PIECES                            **")
         console.log("*******************************************************************************************")
     }
     

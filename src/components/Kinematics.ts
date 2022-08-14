@@ -7,6 +7,23 @@ import { Square } from "./Square";
 
 export class Kinematics {
 
+
+    //Function that will return all pieces from the board, at a given point in time
+    public getAllPieces(currentConfiguration: Square[][]): Piece[]{
+        let allPieces: Piece[] = new Array();
+        for(let i = 1; i<=8; i++){
+            for(let j = 1; j<=8; j++){
+                //Does this square contain a piece ?
+                if (  currentConfiguration[i][j].getPiece() != null){
+                    //Attach that piece to this list:
+                    allPieces.push(currentConfiguration[i][j].getPiece()!);
+                
+                }
+            }
+        }
+        return allPieces;
+    }
+
     //Function that will return either all white / black pieces.
     //Params: color (to know what team to return) & current config which refers to all squares at a given point in time
     public getAllPiecesOfThisColor(color: string, currentConfiguration: Square[][]): Piece[] {
@@ -502,8 +519,7 @@ export class Kinematics {
             return targets;
         }
     
-        //TODO: enpassant
-        public getPawnPositions(currentPawn: Pawn, currentConfiguration: Square[][]){
+        public getPawnPositions(currentPawn: Pawn, currentConfiguration: Square[][], lastPieceMoved: Piece){
             let targets: Position[] = new Array();
     
             let aboveRow = -1;
@@ -564,6 +580,33 @@ export class Kinematics {
                      }
                 }            
             }
+
+            //EN PASSANT LOGIC
+            //Avoid the game start
+            if ( lastPieceMoved !== undefined ) {
+                
+                //Is the last moved piece a pawn?
+                if ( lastPieceMoved.getName() === "pawn" ) {
+                    let attackablePawn = lastPieceMoved as Pawn;
+
+                    //Is this pawn on the same row with the attackable?
+                    if( currentPawn.getPiecePosition().getRowPosition() === lastPieceMoved.getPiecePosition().getRowPosition() ){
+
+                        //Did the attackable move two squares ?
+                        if( attackablePawn.getNumberOfSquaresMovedLast() === 2 ) {
+
+                            //Is the attackable to the east ?
+                            if( attackablePawn.getPiecePosition().getColPosition() === currentPawn.getPiecePosition().getColPosition() + 1 ) {
+                                targets.push( new Position( aboveRow, currentPawn.getPiecePosition().getColPosition() + 1 ) )
+                            }
+                            //Is the attackable to the west ?
+                            if( attackablePawn.getPiecePosition().getColPosition() === currentPawn.getPiecePosition().getColPosition() -1  ) {
+                                targets.push( new Position( aboveRow, currentPawn.getPiecePosition().getColPosition() - 1 ) )
+                            }
+                        }
+                    }
+                }
+            }
             return targets;
         }
     
@@ -577,6 +620,15 @@ export class Kinematics {
         }
     
         public getAllAttackedSquaresByOpponent(currentConfiguration: Square[][], opponentColor: string) : Position[] {
+
+
+        //Extra logic, finding the last moved piece
+        let lastPieceMoved: Piece | null;
+        for (let piece of this.getAllPieces(currentConfiguration)){
+            if( piece.getLastPieceMoved() === true ) {
+                lastPieceMoved = piece;
+            }
+        }
     
             let allOpponentPieces: Piece[] = this.getAllPiecesOfThisColor(opponentColor, currentConfiguration);
             let allOpponentPossibleAttacks: Position[] = new Array();
@@ -619,7 +671,7 @@ export class Kinematics {
                 } else if (piece.getName() == "pawn") {
                     
                     //I am grabbing the attacked positions of this piece, at its own position!
-                    for(let position of this.getPawnPositions(piece as Pawn,currentConfiguration)){
+                    for(let position of this.getPawnPositions(piece as Pawn, currentConfiguration, lastPieceMoved!)){
                         allOpponentPossibleAttacks.push(position);
                     }
                 }
