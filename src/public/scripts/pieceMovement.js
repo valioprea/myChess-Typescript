@@ -182,7 +182,7 @@ After a piece is initialized, I can add it to the square
 
 //a square: document.getElementsByClassName( i )[0].children[ j ] where i=row from 1 to 8 and j=column from 0 to 7
 //PLACE A PIECE
-function placePiece(pieceId, targetSquare, pieceName, color, rowPos, colPos, hasMoved){
+function placePiece(pieceId, targetSquare, pieceName, color, hasMoved){
 
     //get square id
     targetSquareID = targetSquare.id;
@@ -190,6 +190,26 @@ function placePiece(pieceId, targetSquare, pieceName, color, rowPos, colPos, has
     rowPosition = parseInt(String(targetSquareID)[0]);
     colPosition = parseInt(String(targetSquareID)[1]);
     
+
+    //Is the player moving enPassant ?
+    if ( pieceName === "pawn" ){
+        
+        //Is the target square eastern and does not contain a piece?
+        if( colPosition === document.getElementById(pieceId).dataset.colPosition + 1  && document.getElementById(targetSquareID).innerHTML === "" ) {
+            //eliminate opponent's pawn
+            let opponentID = document.getElementById(pieceId).dataset.rowPosition +""+ colPosition;
+            console.log(opponentID)
+            document.getElementById(opponentID).innerHTML = "";
+        }
+        //Is the target square western and does not contain a piece?
+        if( colPosition === document.getElementById(pieceId).dataset.colPosition - 1  && document.getElementById(targetSquareID).innerHTML === "" ) {
+            //eliminate opponent's pawn
+            let opponentID = document.getElementById(pieceId).dataset.rowPosition +""+ colPosition;
+            document.getElementById(opponentID).innerHTML = "";
+        }
+    }
+
+
     //eliminate enemy (if any)
     targetSquare.innerHTML = "";
     //place piece on that square
@@ -200,7 +220,6 @@ function placePiece(pieceId, targetSquare, pieceName, color, rowPos, colPos, has
 
     //Is the player castling ?
     if ( pieceName === "king" && hasMoved === "false"){
-
         // console.log(typeof(hasMoved));
         //If king is white
         if ( color === "white" ) {
@@ -236,6 +255,8 @@ function placePiece(pieceId, targetSquare, pieceName, color, rowPos, colPos, has
         }
 
     }
+
+
 
 
     //Need to set has moved for IMGs
