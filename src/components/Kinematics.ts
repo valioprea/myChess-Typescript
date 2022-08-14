@@ -538,10 +538,10 @@ export class Kinematics {
             }
     
             //Is the above row available?
-            if ( aboveRow >= 1 || aboveRow <=8 ) {
+            if ( aboveRow >= 1 && aboveRow <=8 ) {
                 
                 //Is the next square empty? Straight ahead, first square.
-                if ( currentConfiguration[aboveRow][currentPawn.getPiecePosition().getColPosition()].getPiece() === null ) {
+                if ( currentConfiguration[aboveRow][currentPawn.getPiecePosition().getColPosition()!].getPiece() === null ) {
                     //That square is empty, that is a valid move
                     targets.push( new Position(aboveRow, currentPawn.getPiecePosition().getColPosition()) );
                 }

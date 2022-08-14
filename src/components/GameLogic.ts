@@ -63,11 +63,11 @@ export class GameLogic{
         // this.allSquares[8][7].setPiece(new Knight("knight", true, "white", new Position(8,7)));
         // this.allSquares[8][3].setPiece(new Bishop("bishop", true, "white", new Position(8,3)));
         // this.allSquares[8][6].setPiece(new Bishop("bishop", true, "white", new Position(8,6)));
-        this.allSquares[8][4].setPiece(new Queen("queen", true, "white", new Position(8,4)));
+        // this.allSquares[8][4].setPiece(new Queen("queen", true, "white", new Position(8,4)));
         this.allSquares[8][5].setPiece(new King("king", true, "white", new Position(8,5)));
-        // for(let i=1; i<=8; i++){
-        //     this.allSquares[7][i].setPiece(new Pawn("pawn", true, "white", new Position(7,i)));
-        // }
+        for(let i=1; i<=8; i++){
+            this.allSquares[7][i].setPiece(new Pawn("pawn", true, "white", new Position(7,i)));
+        }
 
         
 

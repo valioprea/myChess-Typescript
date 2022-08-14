@@ -209,6 +209,34 @@ function placePiece(pieceId, targetSquare, pieceName, color, hasMoved){
         }
     }
 
+    //Is the player queening ?
+    if ( pieceName === "pawn"){
+
+        
+        //for White
+        if( rowPosition === 1 ) {
+            
+            let choice = prompt("Choose a piece: 1 - Queen, 2 - Bishop, 3 - Knight, 4 - Rook","");
+            
+            switch(choice){
+                case "1": initializeQueen(rowPosition, colPosition);
+                break;
+                case "2": console.log("implement for bishop");
+                break;
+                case "3": console.log("implement for knight");
+                break;
+                case "4": console.log("implement for rook");
+                break;
+                default:
+                    console.log("y u do dis");
+            }
+            
+            
+
+
+        }
+    }
+
 
     //eliminate enemy (if any)
     targetSquare.innerHTML = "";
@@ -269,4 +297,25 @@ function placePiece(pieceId, targetSquare, pieceName, color, hasMoved){
     }
 
 
+}
+
+function initializeQueen(rowPos, colPos){
+    let numbering = 5000;
+    console.log("initialize queen");
+
+    // let square = document.getElementsByClassName( piece.piecePosition.rowPosition )[0].children[piece.piecePosition.colPosition-1]; //TODO: ceva nu e bine aici
+    
+    let pic = document.createElement("img"); //pic is the actual object of the piece
+    pic.id = numbering;
+    pic.dataset.pieceName = "queen";
+    pic.dataset.color = "white";
+    pic.src = "../static/pics/wQ.png";
+    pic.dataset.rowPosition = rowPos;
+    pic.dataset.colPosition = colPos;
+    pic.draggable = true;
+    pic.addEventListener("dragstart", drag);
+    // pic.addEventListener("click", testThingsOut);
+    square.append(pic);
+
+    numbering++;
 }
