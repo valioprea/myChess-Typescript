@@ -3,7 +3,7 @@
 <br />
 <div align="center">
   <!-- <a href="https://github.com/github_username/repo_name"> -->
-    <img src="auxiliaries/readMe-pic.jpg" alt="Logo" width="150" height="150">
+    <img src="auxiliaries/readMe-pic.jpg" alt="Logo" width="300" height="300">
   </a>
 
 <h3 align="center">My Chess - Typescript</h3>
