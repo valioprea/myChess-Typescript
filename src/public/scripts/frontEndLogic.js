@@ -34,7 +34,6 @@ socket.on("showWinner", (data) => {
 function drag(event) {
 
 	event.dataTransfer.setData("pieceIdThatIsMoved", event.target.id); //temporary assign pieceIdThatIsMoved property with value of piece id
-
     event.dataTransfer.setData("pieceName", event.target.dataset.pieceName);
     event.dataTransfer.setData("pieceColor", event.target.dataset.color);
     event.dataTransfer.setData("rowPos", event.target.dataset.rowPosition);
