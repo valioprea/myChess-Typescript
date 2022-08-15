@@ -12,25 +12,6 @@ socket.on("initializePieces", (allBackendPieces) => {
     initializePieces(allPieces);
 })
 
-//TODO: DELETE THIS
-// // ## Use this to allow all square to be moved to
-// let items = document.querySelectorAll(".square");
-// items.forEach(function (item) {
-// 	item.addEventListener("dragover", allowDrop);
-// 	item.addEventListener("drop", drop);
-// });
-
-
-// function testThingsOut(event){
-//     console.log("I have been clicked");
-//     console.log(event.target) //GET CLICKED PIECE
-
-    
-//     console.log(JSON.stringify(position))
-
-//     socket.emit("testClick", JSON.stringify(position))
-    
-// }
 
 //Get valid moves of selected piece and color the squares accordingly
 socket.on("validMoves", (allValidMovesBackend)=>{
@@ -42,14 +23,25 @@ socket.on("validMoves", (allValidMovesBackend)=>{
     })
 })
 
-
-
+//Display winner
+socket.on("showWinner", (data) => {
+    console.log(data)
+    document.getElementById("winner").innerHTML = data;
+})
 
 
 //DRAG EVENT
 function drag(event) {
-    // debugger
+
 	event.dataTransfer.setData("pieceIdThatIsMoved", event.target.id); //temporary assign pieceIdThatIsMoved property with value of piece id
+    event.dataTransfer.setData("pieceName", event.target.dataset.pieceName);
+    event.dataTransfer.setData("pieceColor", event.target.dataset.color);
+    event.dataTransfer.setData("rowPos", event.target.dataset.rowPosition);
+    event.dataTransfer.setData("colPos", event.target.dataset.colPosition);
+    event.dataTransfer.setData("hasMoved", event.target.dataset.hasMoved);
+
+
+
     //Send to backend the selected piece
     document.getElementById(event.target.id);
     let position = {
@@ -71,8 +63,15 @@ function drop(event) {
     event.preventDefault();
 	let id = event.dataTransfer.getData("pieceIdThatIsMoved"); //get transferred piece ID
 
+    let pieceName = event.dataTransfer.getData("pieceName");
+    let color = event.dataTransfer.getData("pieceColor");
+    let rowPos = event.dataTransfer.getData("rowPos");
+    let colPos = event.dataTransfer.getData("colPos");
+    let hasMoved = event.dataTransfer.getData("hasMoved");
+
+
     //Place visual piece
-    placePiece(id, square); //id of piece & square to place on
+    placePiece(id, square, pieceName, color, hasMoved); //id of piece & square to place on
 
         //remove event listeners from all squares
         let items = document.querySelectorAll(".square");
@@ -81,7 +80,7 @@ function drop(event) {
             item.removeEventListener("drop", drop);
             item.classList.remove("attacked");
         });
-        console.log("dupa debugger")
+        
 
     //Transmit to server what is the target position on which the piece was dropped
     //get square id
@@ -90,27 +89,17 @@ function drop(event) {
     rowPosition = parseInt(String(targetSquareID)[0]);
     colPosition = parseInt(String(targetSquareID)[1]);
     let targetPosition = {rowPosition, colPosition};
+
+    // console.log("CHOSEN PIECE: ", getChosenPiece() )
+    //Check if the last move wasn't actually a queening move
+    let checkValue = getChosenPiece();
+    if ( checkValue !== null ) {
+        socket.emit("chosenPiece", checkValue );
+        resetChosenPiece();
+    }
     
     socket.emit("placedPiece", JSON.stringify(targetPosition));
 }
-
-// function dragend(){
-//     //remove event listeners from all squares
-//     let items = document.querySelectorAll(".square");
-//     items.forEach(function (item) {
-//         item.removeEventListener("dragover", allowDrop);
-//         item.removeEventListener("drop", drop);
-//         item.classList.remove("attacked");
-//     });
-//     console.log("dupa debugger")
-// }
-
-
-
-
-
-
-
 
 
 //ALLOW DROP

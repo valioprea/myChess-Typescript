@@ -23,7 +23,7 @@ body {
   .square {
     height: 50px;
     width: 50px;
-    background-color: #eab676;
+    background-color: #873e23;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -35,7 +35,7 @@ body {
   }
   
   .row:nth-child(odd) .square:nth-child(odd), .row:nth-child(even) .square:nth-child(even) {
-    background-color: #873e23;
+    background-color: #eab676;
   }
   
   .square:-moz-drag-over {
