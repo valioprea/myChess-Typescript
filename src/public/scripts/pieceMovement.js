@@ -189,22 +189,22 @@ function placePiece(pieceId, targetSquare, pieceName, color, hasMoved){
     //get square position (from div)
     rowPosition = parseInt(String(targetSquareID)[0]);
     colPosition = parseInt(String(targetSquareID)[1]);
+
+    console.log("THE TARGET SQUARE IS: ",rowPosition,colPosition)
     
 
     //Is the player moving enPassant ?
     if ( pieceName === "pawn" ){
-        
+        let colPositionOfPiece = parseInt(document.getElementById(pieceId).dataset.colPosition);
+        let opponentID = document.getElementById(pieceId).dataset.rowPosition +""+ colPosition;
         //Is the target square eastern and does not contain a piece?
-        if( colPosition === document.getElementById(pieceId).dataset.colPosition + 1  && document.getElementById(targetSquareID).innerHTML === "" ) {
+        if( colPosition === colPositionOfPiece + 1  && document.getElementById(targetSquareID).innerHTML === "" ) {
             //eliminate opponent's pawn
-            let opponentID = document.getElementById(pieceId).dataset.rowPosition +""+ colPosition;
-            console.log(opponentID)
             document.getElementById(opponentID).innerHTML = "";
         }
         //Is the target square western and does not contain a piece?
-        if( colPosition === document.getElementById(pieceId).dataset.colPosition - 1  && document.getElementById(targetSquareID).innerHTML === "" ) {
+        if( colPosition === colPositionOfPiece - 1  && document.getElementById(targetSquareID).innerHTML === "" ) {
             //eliminate opponent's pawn
-            let opponentID = document.getElementById(pieceId).dataset.rowPosition +""+ colPosition;
             document.getElementById(opponentID).innerHTML = "";
         }
     }
