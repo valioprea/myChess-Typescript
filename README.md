@@ -4,7 +4,7 @@
 <div align="center">
   <!-- <a href="https://github.com/github_username/repo_name"> -->
     <img src="auxiliaries/readMe-pic.jpg" alt="Logo" width="300" height="300">
-  </a>
+  <!-- </a> -->
 
 <h3 align="center">My Chess - Typescript</h3>
 
@@ -45,6 +45,18 @@
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
+
+<!-- About the project -->
+## About The Project
+<div align="center">
+  <!-- <a href="https://github.com/github_username/repo_name"> -->
+    <img src="auxiliaries/myBoard.jpg" alt="Logo" width="300" height="300">
+  <!-- </a> -->
+</div>
+
+
+
+
 
 
 To start the server run in bash:
