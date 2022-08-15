@@ -42,7 +42,7 @@ export class SocketIoServer {
             socket.on("selectPiece", (frontEndPosition) => {
                 let {rowPosition, colPosition} = JSON.parse(frontEndPosition);
                 let initialPosition: Position = new Position(rowPosition,colPosition);
-                console.log("INITIAL POSITION, BE: ", initialPosition)
+                // console.log("INITIAL POSITION, BE: ", initialPosition)
                 gameLogic.grabPiece(initialPosition);
                 socket.emit("validMoves", JSON.stringify( gameLogic.getMovesForThisPiece(gameLogic.getSelectedPiece()!, gameLogic.getAllSquares())) );
             })
@@ -51,12 +51,15 @@ export class SocketIoServer {
             socket.on("placedPiece", (targetPosition) => {
                 let {rowPosition, colPosition} = JSON.parse(targetPosition);
                 gameLogic.placePiece(new Position(rowPosition,colPosition));
-                console.log("************")
-                console.log(gameLogic.getWinner())
-                console.log("************")
+                // console.log("************")
+                // console.log(gameLogic.getWinner())
+                // console.log("************")
                 socket.emit("showWinner", JSON.stringify( gameLogic.getWinner() ));
             })
 
+            socket.on("chosenPiece", (value) => {
+                gameLogic.setChosenPiece(value as number);
+            })
 
             //FOR DEVELOPMENT PURPOSES SANITY CHECK
             socket.on("sanityCheck", () => {
