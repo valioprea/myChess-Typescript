@@ -176,3 +176,8 @@ A big big thank you as well for my other friends with which I spent some good ho
 
 And also I would like to thank the creator of the cloning package, it literally saved this app and made it functional. <br>
 https://www.npmjs.com/package/lodash
+
+Last but not least, kudos to the person who inspired me with this mega cool readme page:
+<br>
+https://github.com/othneildrew/Best-README-Template
+
