@@ -50,7 +50,7 @@
 ## About The Project
 <div align="center">
   <!-- <a href="https://github.com/github_username/repo_name"> -->
-    <img src="auxiliaries/myBoard.jpg" alt="Logo" width="300" height="300">
+    <img src="auxiliaries/myBoard.png" alt="Picture of board" width="300" height="300">
   <!-- </a> -->
 </div>
 
