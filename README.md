@@ -1,25 +1,26 @@
 <!-- PROJECT LOGO -->
+
 <br />
 <div align="center">
+  <!-- <a href="https://github.com/github_username/repo_name"> -->
+    <img src="auxiliaries/readMe-pic.jpg" alt="Logo" width="80" height="80">
+  </a>
 
-    <img src="auxiliaries/readMe-pic.jpg" alt="Picture" width="80" height=""80>
+<h3 align="center">My Chess - Typescript</h3>
 
-    <h3 align="center">My Chess - Typescript</h3>
-
-    <p align="center">
-    project_description
+  <p align="center">
+    My challenge of developing a chess board.
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/valioprea/myChess-Typescript/wiki"><strong>Explore the docs (wiki) »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
+    <!-- <a href="https://github.com/github_username/repo_name">View Demo</a>
     ·
     <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
     ·
-    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a>
-    </p>
+    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a> -->
+  </p>
 </div>
-
 
 
 To start the server run in bash:
