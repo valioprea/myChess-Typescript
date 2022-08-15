@@ -209,7 +209,6 @@ function placePiece(pieceId, targetSquare, pieceName, color, hasMoved){
         }
     }
 
-
     //eliminate enemy (if any)
     targetSquare.innerHTML = "";
     //place piece on that square
@@ -256,9 +255,6 @@ function placePiece(pieceId, targetSquare, pieceName, color, hasMoved){
 
     }
 
-
-
-
     //Need to set has moved for IMGs
     if (pieceName === "pawn"){
         document.getElementById(pieceId).dataset.hasMoved = "true";
@@ -268,5 +264,150 @@ function placePiece(pieceId, targetSquare, pieceName, color, hasMoved){
         document.getElementById(pieceId).dataset.hasMoved = "true";
     }
 
+    //Is the player queening ?
+    if ( pieceName === "pawn"){
+        //for White
+        if( rowPosition === 1 ) {
+            let choice = prompt("Choose a piece: 1 - Queen, 2 - Bishop, 3 - Knight, 4 - Rook","");
+            switch(choice){
+                case "1": initializeQueen(rowPosition, colPosition, targetSquare, color);
+                break;
+                case "2": initializeBishop(rowPosition, colPosition, targetSquare, color);;
+                break;
+                case "3": initializeKnight(rowPosition, colPosition, targetSquare, color);
+                break;
+                case "4": initializeRook(rowPosition, colPosition, targetSquare, color);
+                break;
+                default:
+                    console.log("y u do dis");
+            }
+        }
 
+        //for black
+        if (rowPosition === 8 ) {
+            let choice = prompt("Choose a piece: 1 - Queen, 2 - Bishop, 3 - Knight, 4 - Rook","");
+            switch(choice){
+                case "1": initializeQueen(rowPosition, colPosition, targetSquare, color);
+                break;
+                case "2": initializeBishop(rowPosition, colPosition, targetSquare, color);;
+                break;
+                case "3": initializeKnight(rowPosition, colPosition, targetSquare, color);
+                break;
+                case "4": initializeRook(rowPosition, colPosition, targetSquare, color);
+                break;
+                default:
+                    console.log("y u do dis");
+            }
+        }
+    }
+}
+
+
+//TO SEND TO BACKEND
+let chosenPiece = null;
+function getChosenPiece(){
+    return chosenPiece;
+}
+function resetChosenPiece() {
+    chosenPiece = null;
+}
+
+function initializeQueen(rowPos, colPos, targetSquare, color){
+    let numbering = 5000;
+    //Eliminate the pawn
+    targetSquare.innerHTML = "";
+    let square = document.getElementsByClassName( rowPos )[0].children[colPos-1];
+    let pic = document.createElement("img"); //pic is the actual object of the piece
+    pic.id = numbering;
+    pic.dataset.pieceName = "queen";
+    if (color === "white"){
+        pic.dataset.color = "white";
+        pic.src = "../static/pics/wQ.png";
+    } else if (color === "black") {
+        pic.dataset.color = "black";
+        pic.src = "../static/pics/bQ.png";
+    }
+    pic.dataset.rowPosition = rowPos;
+    pic.dataset.colPosition = colPos;
+    pic.draggable = true;
+    pic.addEventListener("dragstart", drag);
+    // pic.addEventListener("click", testThingsOut);
+    square.append(pic);
+    chosenPiece = 1;
+    numbering++;
+}
+
+function initializeBishop(rowPos, colPos, targetSquare, color){
+    let numbering = 6000;
+    //Eliminate the pawn
+    targetSquare.innerHTML = "";
+    let square = document.getElementsByClassName( rowPos )[0].children[colPos-1];
+    let pic = document.createElement("img"); //pic is the actual object of the piece
+    pic.id = numbering;
+    pic.dataset.pieceName = "bishop";
+    if (color === "white"){
+        pic.dataset.color = "white";
+        pic.src = "../static/pics/wB.png";
+    } else if (color === "black") {
+        pic.dataset.color = "black";
+        pic.src = "../static/pics/bB.png";
+    }
+    pic.dataset.rowPosition = rowPos;
+    pic.dataset.colPosition = colPos;
+    pic.draggable = true;
+    pic.addEventListener("dragstart", drag);
+    // pic.addEventListener("click", testThingsOut);
+    square.append(pic);
+    chosenPiece = 2;
+    numbering++;
+}
+
+function initializeKnight(rowPos, colPos, targetSquare, color){
+    let numbering = 7000;
+    //Eliminate the pawn
+    targetSquare.innerHTML = "";
+    let square = document.getElementsByClassName( rowPos )[0].children[colPos-1];
+    let pic = document.createElement("img"); //pic is the actual object of the piece
+    pic.id = numbering;
+    pic.dataset.pieceName = "knight";
+    if (color === "white"){
+        pic.dataset.color = "white";
+        pic.src = "../static/pics/wN.png";
+    } else if (color === "black") {
+        pic.dataset.color = "black";
+        pic.src = "../static/pics/bN.png";
+    }
+    pic.dataset.rowPosition = rowPos;
+    pic.dataset.colPosition = colPos;
+    pic.draggable = true;
+    pic.addEventListener("dragstart", drag);
+    // pic.addEventListener("click", testThingsOut);
+    square.append(pic);
+    chosenPiece = 3;
+    numbering++;
+}
+
+function initializeRook(rowPos, colPos, targetSquare, color){
+    let numbering = 8000;
+    //Eliminate the pawn
+    targetSquare.innerHTML = "";
+    let square = document.getElementsByClassName( rowPos )[0].children[colPos-1];
+    let pic = document.createElement("img"); //pic is the actual object of the piece
+    pic.id = numbering;
+    pic.dataset.pieceName = "rook";
+    if (color === "white"){
+        pic.dataset.color = "white";
+        pic.src = "../static/pics/wR.png";
+    } else if (color === "black") {
+        pic.dataset.color = "black";
+        pic.src = "../static/pics/bR.png";
+    }
+    pic.dataset.rowPosition = rowPos;
+    pic.dataset.colPosition = colPos;
+    pic.draggable = true;
+    pic.addEventListener("dragstart", drag);
+    // pic.addEventListener("click", testThingsOut);
+    square.append(pic);
+    chosenPiece = 4;
+    numbering++;
 }

@@ -15,8 +15,18 @@ export class GameLogic{
     private kinematics: Kinematics = new Kinematics();
     public allSquares: Square[][] = new Array();
     public selectedPiece: Piece | null = null; //not sure about the ? thing.
-    public gameTurn: String | null = null;
-    private winner: String = "";
+    public gameTurn: string | null = null;
+    private winner: string = "";
+    private chosenPiece: number = 0;
+
+    // 1-queen, 2-bishop, 3-knight, 4-rook
+    public setChosenPiece(value: number) {
+        this.chosenPiece = value;
+    }
+
+    public getChosenPiece(): number {
+        return this.chosenPiece;
+    }
 
     public getWinner(){
         return this.winner;
@@ -30,11 +40,11 @@ export class GameLogic{
         return this.selectedPiece;
     }
 
-    public setGameTurn(gameTurn: String){
+    public setGameTurn(gameTurn: string){
         this.gameTurn = gameTurn;
     }
 
-    public getGameTurn(): String {
+    public getGameTurn(): string {
         return this.gameTurn!;
     }
 
@@ -57,32 +67,32 @@ export class GameLogic{
     //This function will initialize pieces on start position
     public initializePieces() {
         //white pieces
-        // this.allSquares[8][1].setPiece(new Rook("rook", true, "white", new Position(8,1)));
-        // this.allSquares[8][8].setPiece(new Rook("rook", true, "white", new Position(8,8)));
-        // this.allSquares[8][2].setPiece(new Knight("knight", true, "white", new Position(8,2)));
-        // this.allSquares[8][7].setPiece(new Knight("knight", true, "white", new Position(8,7)));
-        // this.allSquares[8][3].setPiece(new Bishop("bishop", true, "white", new Position(8,3)));
-        // this.allSquares[8][6].setPiece(new Bishop("bishop", true, "white", new Position(8,6)));
+        this.allSquares[8][1].setPiece(new Rook("rook", true, "white", new Position(8,1)));
+        this.allSquares[8][8].setPiece(new Rook("rook", true, "white", new Position(8,8)));
+        this.allSquares[8][2].setPiece(new Knight("knight", true, "white", new Position(8,2)));
+        this.allSquares[8][7].setPiece(new Knight("knight", true, "white", new Position(8,7)));
+        this.allSquares[8][3].setPiece(new Bishop("bishop", true, "white", new Position(8,3)));
+        this.allSquares[8][6].setPiece(new Bishop("bishop", true, "white", new Position(8,6)));
         this.allSquares[8][4].setPiece(new Queen("queen", true, "white", new Position(8,4)));
         this.allSquares[8][5].setPiece(new King("king", true, "white", new Position(8,5)));
-        // for(let i=1; i<=8; i++){
-        //     this.allSquares[7][i].setPiece(new Pawn("pawn", true, "white", new Position(7,i)));
-        // }
+        for(let i=1; i<=8; i++){
+            this.allSquares[7][i].setPiece(new Pawn("pawn", true, "white", new Position(7,i)));
+        }
 
         
 
         //black pieces
-        // this.allSquares[1][1].setPiece(new Rook("rook", false, "black", new Position(1,1)));
-        // this.allSquares[1][8].setPiece(new Rook("rook", false, "black", new Position(1,8)));
-        // this.allSquares[1][2].setPiece(new Knight("knight", false, "black", new Position(1,2)));
-        // this.allSquares[1][7].setPiece(new Knight("knight", false, "black", new Position(1,7)));
-        // this.allSquares[1][3].setPiece(new Bishop("bishop", false, "black", new Position(1,3)));
-        // this.allSquares[1][6].setPiece(new Bishop("bishop", false, "black", new Position(1,6)));
-        // this.allSquares[1][4].setPiece(new Queen("queen", false, "black", new Position(1,4)));
+        this.allSquares[1][1].setPiece(new Rook("rook", false, "black", new Position(1,1)));
+        this.allSquares[1][8].setPiece(new Rook("rook", false, "black", new Position(1,8)));
+        this.allSquares[1][2].setPiece(new Knight("knight", false, "black", new Position(1,2)));
+        this.allSquares[1][7].setPiece(new Knight("knight", false, "black", new Position(1,7)));
+        this.allSquares[1][3].setPiece(new Bishop("bishop", false, "black", new Position(1,3)));
+        this.allSquares[1][6].setPiece(new Bishop("bishop", false, "black", new Position(1,6)));
+        this.allSquares[1][4].setPiece(new Queen("queen", false, "black", new Position(1,4)));
         this.allSquares[1][5].setPiece(new King("king", false, "black", new Position(1,5)));
-        // for(let i=1; i<=8; i++){
-        //     this.allSquares[2][i].setPiece(new Pawn("pawn", false, "black", new Position(2,i)));
-        // }
+        for(let i=1; i<=8; i++){
+            this.allSquares[2][i].setPiece(new Pawn("pawn", false, "black", new Position(2,i)));
+        }
     }
 
     //This function should deal with game turn
@@ -154,7 +164,7 @@ export class GameLogic{
                 opponentKing = piece as King;
             }
         }
-
+        
         //checkmate = can't move + king in check
         if ( this.isMyKingInCheck( opponentKing! , this.allSquares) === true && canOpponentMove === false ) {
             this.winner = myColor + " WINS THE GAME"
@@ -249,6 +259,58 @@ export class GameLogic{
 
         //Set true to last moved piece - the selected piece.
         this.selectedPiece!.setLastPieceMoved(true);
+
+        //Queening Logic
+        //Is the chosen piece different than zero ? -> that means something was selected on front end
+        if( this.getChosenPiece() !== 0 && this.selectedPiece!.getName() === "pawn") {
+
+            //is target row 1 or 8 ?
+            if ( targetPosition.getRowPosition() === 1 || targetPosition.getRowPosition() === 8 ) {
+                //determine what piece was chosen
+                //queen
+                if (this.getChosenPiece() === 1){
+                    let name: string = "queen";
+                    let color: string = this.selectedPiece!.getColor();
+                    let row: number = targetPosition.getRowPosition();
+                    let col: number = targetPosition.getColPosition();
+                    //Eliminate the pawn
+                    this.allSquares[row][col].eliminatePiece( this.selectedPiece! );
+                    //Initialize new queen
+                    this.allSquares[row][col].setPiece( new Queen(name, false, color, new Position(row,col)) );
+                    this.setChosenPiece(0);
+                } else if ( this.getChosenPiece() === 2 ) {
+                    let name: string = "bishop";
+                    let color: string = this.selectedPiece!.getColor();
+                    let row: number = targetPosition.getRowPosition();
+                    let col: number = targetPosition.getColPosition();
+                    //Eliminate the pawn
+                    this.allSquares[row][col].eliminatePiece( this.selectedPiece! );
+                    //Initialize new bishop
+                    this.allSquares[row][col].setPiece( new Bishop(name, false, color, new Position(row,col)) );
+                    this.setChosenPiece(0);
+                } else if ( this.getChosenPiece() === 3 ) {
+                    let name: string = "knight";
+                    let color: string = this.selectedPiece!.getColor();
+                    let row: number = targetPosition.getRowPosition();
+                    let col: number = targetPosition.getColPosition();
+                    //Eliminate the pawn
+                    this.allSquares[row][col].eliminatePiece( this.selectedPiece! );
+                    //Initialize new knight
+                    this.allSquares[row][col].setPiece( new Knight(name, false, color, new Position(row,col)) );
+                    this.setChosenPiece(0);
+                } else if ( this.getChosenPiece() === 4 ) {
+                    let name: string = "rook";
+                    let color: string = this.selectedPiece!.getColor();
+                    let row: number = targetPosition.getRowPosition();
+                    let col: number = targetPosition.getColPosition();
+                    //Eliminate the pawn
+                    this.allSquares[row][col].eliminatePiece( this.selectedPiece! );
+                    //Initialize new rook
+                    this.allSquares[row][col].setPiece( new Rook(name, false, color, new Position(row,col)) );
+                    this.setChosenPiece(0);
+                }
+            }
+        }
 
         this.finishTurn();
     }

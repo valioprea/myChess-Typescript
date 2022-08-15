@@ -90,6 +90,14 @@ function drop(event) {
     rowPosition = parseInt(String(targetSquareID)[0]);
     colPosition = parseInt(String(targetSquareID)[1]);
     let targetPosition = {rowPosition, colPosition};
+
+    // console.log("CHOSEN PIECE: ", getChosenPiece() )
+    //Check if the last move wasn't actually a queening move
+    let checkValue = getChosenPiece();
+    if ( checkValue !== null ) {
+        socket.emit("chosenPiece", checkValue );
+        resetChosenPiece();
+    }
     
     socket.emit("placedPiece", JSON.stringify(targetPosition));
 }
