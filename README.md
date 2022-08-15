@@ -1,3 +1,12 @@
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+    <img src="auxiliaries/readMe-pic.jpg" alt="Picture" width="80" height=""80>
+</div>
+
+
+
+
 To start the server run in bash:
 
 (npm run build - to get the js files) -> for when the project is going to be finished
