@@ -162,7 +162,7 @@ I am a sociable person and I love writing code. For any suggestions, or collabor
 
 Valentin Oprea - [@linkedin](https://www.linkedin.com/in/valioprea/) - aeroprea@gmail.com
 
-Project Link: [https://github.com/valioprea/myChess-Typescript)
+Project Link: [https://github.com/valioprea/myChess-Typescript]
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
