@@ -66,6 +66,8 @@ From a holistic perspective, this project encompasses many major areas of web de
 
 Many many things are still yet to be implemented but the road is long and I worked on this mostly myself. I had some help on the FE side of things to be able to touch pieces and select them and a little bit of help with the websocket used to communicate with the back end.
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ### Built With
 * HTML
 * CSS
@@ -73,6 +75,8 @@ Many many things are still yet to be implemented but the road is long and I work
 * Typescript
 * Express JS
 * Socket.IO
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -97,6 +101,8 @@ Enjoy! <br>
 You need to have node already installed on your machine.
 If you don't have it just go to -> https://nodejs.org/en/
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <!-- USAGE EXAMPLES -->
 ## Usage
 
@@ -106,6 +112,8 @@ The UI needs massive improvement and the player will be constricted to use the a
 - the pieces need ONLY to be dragged and after that dropped on the marked squares
 - DON'T: click a piece and then a target square. As above, just drag it.
 - try to respect the white / black alternating moves. On BE still some validations need to be made but on the FE there is no stopping at the moment.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ROADMAP -->
 ## Roadmap
@@ -134,6 +142,7 @@ As previously stated, many things have yet to be implemented but I am happy that
 - [ ] Wiki pages of this repo
 - [ ] And many more, so ...stay tuned!
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -155,6 +164,8 @@ Contributing:
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <!-- CONTACT -->
 ## Contact
 
@@ -163,6 +174,8 @@ I am a sociable person and I love writing code. For any suggestions, or collabor
 Valentin Oprea - [@linkedin](https://www.linkedin.com/in/valioprea/) - aeroprea@gmail.com
 
 Project Link: [https://github.com/valioprea/myChess-Typescript]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
