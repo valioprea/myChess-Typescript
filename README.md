@@ -174,7 +174,7 @@ Many thanks in the first place for the guys that helped me on the road.<br>
 A big big thank you as well for my other friends with which I spent some good hours brainstorming this and that regarding algorithms and solutions.
 <br>
 
-And also I would like to thank the creator of the cloning package, it literally saved this app and made it functional. <br>
+And also I would like to thank the creator of the cloning package, it literally was a turning point in the development of this app. <br>
 https://www.npmjs.com/package/lodash
 
 Last but not least, kudos to the person who inspired me with this mega cool readme page:
