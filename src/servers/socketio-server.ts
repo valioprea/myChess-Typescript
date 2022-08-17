@@ -34,7 +34,7 @@ export class SocketIoServer {
             socket.on("startGame", () => {
                 console.log("game starts");           
                 let allPieces: Piece[] = gameLogic.getKinematics().getAllPieces( gameLogic.getAllSquares());
-                socket.emit( "initializePieces", JSON.stringify(allPieces) );
+                socket.emit( "drawPieces", JSON.stringify(allPieces) );
             })
 
 
@@ -51,9 +51,10 @@ export class SocketIoServer {
             socket.on("placedPiece", (targetPosition) => {
                 let {rowPosition, colPosition} = JSON.parse(targetPosition);
                 gameLogic.placePiece(new Position(rowPosition,colPosition));
-                // console.log("************")
-                // console.log(gameLogic.getWinner())
-                // console.log("************")
+                
+                let allPieces: Piece[] = gameLogic.getKinematics().getAllPieces( gameLogic.getAllSquares());
+                socket.emit( "drawPieces", JSON.stringify(allPieces) );
+
                 socket.emit("showWinner", JSON.stringify( gameLogic.getWinner() ));
             })
 
