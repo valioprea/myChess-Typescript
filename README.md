@@ -142,6 +142,14 @@ As previously stated, many things have yet to be implemented but I am happy that
 - [ ] Wiki pages of this repo
 - [ ] And many more, so ...stay tuned!
 
+Rules & features implemented - as a reminder for myself to always test them
+- Pawn moves 1 or 2 squares as a first move
+- En Passant move
+- Castling both sides
+- Pawn promotion - with choices: queen, bishop, knight, rook
+- Checkmate
+- Stalemate by not having legal squares to move
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
