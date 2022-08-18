@@ -32,9 +32,9 @@ export class SocketIoServer {
 
             //The game starts, the front end board will be populated with the pieces
             socket.on("startGame", () => {
-                console.log("game starts");           
+                console.log("Game Starts");           
                 let allPieces: Piece[] = gameLogic.getKinematics().getAllPieces( gameLogic.getAllSquares());
-                socket.emit( "initializePieces", JSON.stringify(allPieces) );
+                socket.emit( "drawPieces", JSON.stringify(allPieces) );
             })
 
 
@@ -42,7 +42,7 @@ export class SocketIoServer {
             socket.on("selectPiece", (frontEndPosition) => {
                 let {rowPosition, colPosition} = JSON.parse(frontEndPosition);
                 let initialPosition: Position = new Position(rowPosition,colPosition);
-                // console.log("INITIAL POSITION, BE: ", initialPosition)
+                
                 gameLogic.grabPiece(initialPosition);
                 socket.emit("validMoves", JSON.stringify( gameLogic.getMovesForThisPiece(gameLogic.getSelectedPiece()!, gameLogic.getAllSquares())) );
             })
@@ -51,9 +51,10 @@ export class SocketIoServer {
             socket.on("placedPiece", (targetPosition) => {
                 let {rowPosition, colPosition} = JSON.parse(targetPosition);
                 gameLogic.placePiece(new Position(rowPosition,colPosition));
-                // console.log("************")
-                // console.log(gameLogic.getWinner())
-                // console.log("************")
+                
+                let allPieces: Piece[] = gameLogic.getKinematics().getAllPieces( gameLogic.getAllSquares());
+                socket.emit( "drawPieces", JSON.stringify(allPieces) );
+
                 socket.emit("showWinner", JSON.stringify( gameLogic.getWinner() ));
             })
 
