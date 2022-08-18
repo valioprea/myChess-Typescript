@@ -25,7 +25,7 @@ export class Piece {
     }
 
     public setCanBeMoved(canBeMoved: boolean) {
-        this.canBeMoved = this.canBeMoved;
+        this.canBeMoved = canBeMoved;
     }
 
     public getColor(): string {
@@ -47,6 +47,4 @@ export class Piece {
     public setLastPieceMoved( value: boolean ) {
         this.lastPieceMoved = value;
     }
-
-
 }

@@ -32,12 +32,7 @@ socket.on("showWinner", (data) => {
 //DRAG EVENT
 function drag(event) {
 
-	event.dataTransfer.setData("pieceIdThatIsMoved", event.target.id); //temporary assign pieceIdThatIsMoved property with value of piece id
     event.dataTransfer.setData("pieceName", event.target.dataset.pieceName);
-    event.dataTransfer.setData("pieceColor", event.target.dataset.color);
-    event.dataTransfer.setData("rowPos", event.target.dataset.rowPosition);
-    event.dataTransfer.setData("colPos", event.target.dataset.colPosition);
-    event.dataTransfer.setData("hasMoved", event.target.dataset.hasMoved);
 
     //Send to backend the selected piece
     document.getElementById(event.target.id); //TODO: I need to be careful with the ID here!!
@@ -63,17 +58,16 @@ function drop(event) {
     //To transmit to server what is the target position on which the piece was dropped
     //get square id
     targetSquareID = square.id;
-    //get square position (from div)
+    //get target square position (from div)
     rowPosition = parseInt(String(targetSquareID)[0]);
     colPosition = parseInt(String(targetSquareID)[1]);
     let targetPosition = {rowPosition, colPosition};
     
     let pieceName = event.dataTransfer.getData("pieceName");
-    let color = event.dataTransfer.getData("pieceColor");
-
+    
     //Is player queening?
     if ( pieceName === "pawn" ) {
-        isPlayerQueening(rowPosition, colPosition, square, color);
+        isPlayerQueening(rowPosition);
     }
 
     //remove event listeners from all squares

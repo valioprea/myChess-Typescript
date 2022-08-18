@@ -14,7 +14,7 @@ export class GameLogic{
 
     private kinematics: Kinematics = new Kinematics();
     public allSquares: Square[][] = new Array();
-    public selectedPiece: Piece | null = null; //not sure about the ? thing.
+    public selectedPiece: Piece | null = null;
     public gameTurn: string | null = null;
     private winner: string = "";
     private chosenPiece: number = 0;
@@ -53,7 +53,6 @@ export class GameLogic{
         for( let i=1; i<=8; i++){
             this.allSquares[i] = [];
             for( let j=1; j<=8; j++){
-                // console.log("vali");
                 this.allSquares[i][j] = new Square(new Position(i,j));
             }
         }
@@ -78,8 +77,6 @@ export class GameLogic{
         for(let i=1; i<=8; i++){
             this.allSquares[7][i].setPiece(new Pawn("pawn", true, "white", new Position(7,i)));
         }
-
-        
 
         //black pieces
         this.allSquares[1][1].setPiece(new Rook("rook", false, "black", new Position(1,1)));
