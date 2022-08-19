@@ -622,13 +622,13 @@ export class Kinematics {
         public getAllAttackedSquaresByOpponent(currentConfiguration: Square[][], opponentColor: string) : Position[] {
 
 
-        //Extra logic, finding the last moved piece
-        let lastPieceMoved: Piece | null;
-        for (let piece of this.getAllPieces(currentConfiguration)){
-            if( piece.getLastPieceMoved() === true ) {
-                lastPieceMoved = piece;
+            //Extra logic, finding the last moved piece
+            let lastPieceMoved: Piece | null;
+            for (let piece of this.getAllPieces(currentConfiguration)){
+                if( piece.getLastPieceMoved() === true ) {
+                    lastPieceMoved = piece;
+                }
             }
-        }
     
             let allOpponentPieces: Piece[] = this.getAllPiecesOfThisColor(opponentColor, currentConfiguration);
             let allOpponentPossibleAttacks: Position[] = new Array();
@@ -798,9 +798,4 @@ export class Kinematics {
 
         return castlingPositions;
     }
-
-
-
-
-
 }
